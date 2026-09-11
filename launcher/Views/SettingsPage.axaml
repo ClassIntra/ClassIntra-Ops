@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClassIntraOps.Launcher.Views.SettingsPage">
+  <ScrollViewer>
+    <StackPanel Spacing="14">
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="CI 仓库位置" FontWeight="SemiBold" FontSize="14"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox x:Name="RootBox" PlaceholderText="D:/NetWork/Integration/ClassIntra"/>
+            <Button x:Name="BtnSaveRoot" Content="保存" Grid.Column="1" Margin="8,0,0,0" Padding="16,6"/>
+          </Grid>
+          <TextBlock TextWrapping="Wrap" FontSize="11.5" Opacity="0.65"
+                     Text="判定依据：该目录下同时存在 ecosystem.config.js 与 server/。保存后所有页面立即使用新路径。"/>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="命令行工具" FontWeight="SemiBold" FontSize="14"/>
+          <StackPanel x:Name="ToolsHost" Spacing="2"/>
+          <Button x:Name="BtnDetect" Content="重新检测" Padding="14,5"/>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Web 控制台（无头 Linux 备用形态）" FontWeight="SemiBold" FontSize="14"/>
+          <TextBlock TextWrapping="Wrap" FontSize="12" Opacity="0.75"
+                     Text="ops-server 是零依赖的 Node Web 控制台，功能与本程序一致。桌面环境跑不了 Avalonia 时（无头 Linux 服务器），用它 + 浏览器远程访问。本进程绝不放进 PM2 托管——它要重启 PM2，被 PM2 管等于自杀。"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button x:Name="BtnStartWeb" Content="启动 Web 控制台" Padding="14,6"/>
+            <Button x:Name="BtnOpenWeb" Content="打开浏览器" Padding="14,6"/>
+            <TextBlock x:Name="WebStatus" Text="" VerticalAlignment="Center" FontSize="12" Opacity="0.7"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

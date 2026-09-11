@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClassIntraOps.Launcher.Views.InstallPage">
+  <Grid RowDefinitions="Auto,*">
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <TextBlock Text="从 GitHub 安装 / 更新 CI" FontWeight="SemiBold" FontSize="14"/>
+        <Grid ColumnDefinitions="Auto,*,Auto,*">
+          <TextBlock Text="仓库" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12.5"/>
+          <TextBox x:Name="RepoBox" Grid.Column="1"/>
+          <TextBlock Grid.Column="2" Text="分支/标签" VerticalAlignment="Center" Margin="12,0,8,0" FontSize="12.5"/>
+          <TextBox x:Name="RefBox" Grid.Column="3" Width="110"/>
+        </Grid>
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+          <TextBlock Text="目标目录" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12.5"/>
+          <TextBox x:Name="DirBox" Grid.Column="1" PlaceholderText="留空则用「环境设置」中的 CI 仓库路径"/>
+          <CheckBox x:Name="ChkInstall" Content="装依赖" Grid.Column="2" IsChecked="True" VerticalAlignment="Center" Margin="12,0,0,0"/>
+          <CheckBox x:Name="ChkBuild" Content="构建前端" Grid.Column="3" IsChecked="True" VerticalAlignment="Center" Margin="12,0,0,0"/>
+        </Grid>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button x:Name="BtnRun" Content="开始" Classes="accent" Padding="24,7"/>
+          <CheckBox x:Name="ChkStart" Content="完成后启动服务" VerticalAlignment="Center" IsChecked="True"/>
+          <TextBlock x:Name="StatusText" Text="" VerticalAlignment="Center" FontSize="12" Opacity="0.7"/>
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" FontSize="11.5" Opacity="0.65"
+                   Text="每步输出实时回显。任一步失败即停并保留现场，不自动回滚——避免破坏已有部署。安装依赖包含 better-sqlite3 编译，失败时请安装 VS Build Tools 后重试。"/>
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Row="1" Classes="card" Margin="0,12,0,0">
+      <TextBox x:Name="LogBox" IsReadOnly="True" FontFamily="Consolas, DejaVu Sans Mono, monospace" FontSize="12"
+               TextWrapping="Wrap" AcceptsReturn="True" PlaceholderText="执行过程将在这里实时输出。"/>
+    </Border>
+  </Grid>
+</UserControl>

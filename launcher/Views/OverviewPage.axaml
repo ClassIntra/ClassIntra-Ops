@@ -1,0 +1,148 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClassIntraOps.Launcher.Views.OverviewPage">
+
+  <ScrollViewer>
+    <StackPanel Spacing="12">
+
+      <!-- 大数字状态卡（Total Balance 式） -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel>
+            <TextBlock Classes="k" Text="CLASSINTRA 服务状态"/>
+            <StackPanel Orientation="Horizontal" Spacing="9" Margin="0,7,0,0">
+              <TextBlock x:Name="OnlineCount" FontSize="34" FontWeight="Bold" LineHeight="36"
+                         Foreground="{DynamicResource AppTextPrimaryBrush}" Text="—"/>
+              <TextBlock x:Name="OnlineTotal" Text="/ — 进程在线" FontSize="15"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}"
+                         VerticalAlignment="Center" Margin="0,4,0,0"/>
+            </StackPanel>
+            <TextBlock x:Name="StatusLine" Classes="sub" Margin="0,9,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+          <Border x:Name="LivePill" Grid.Column="1" Classes="pill" VerticalAlignment="Top"
+                  Background="{DynamicResource LimeBgBrush}">
+            <TextBlock x:Name="LiveText" Text="LIVE" FontSize="11" FontWeight="Bold"
+                       Foreground="{DynamicResource LimeBrush}"/>
+          </Border>
+        </Grid>
+      </Border>
+
+      <!-- 资源历史柱状图 -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="资源使用 · 近 12 分钟（30s/点）" Classes="cardtitle" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <Rectangle Width="8" Height="8" RadiusX="2" RadiusY="2" Fill="{DynamicResource IconPurpleBrush}"/>
+                <TextBlock Classes="sub" Text="CPU"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <Rectangle Width="8" Height="8" RadiusX="2" RadiusY="2" Fill="{DynamicResource IconBlueBrush}"/>
+                <TextBlock Classes="sub" Text="内存"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <Rectangle Width="8" Height="8" RadiusX="2" RadiusY="2" Fill="{DynamicResource IconGreenBrush}"/>
+                <TextBlock Classes="sub" Text="磁盘"/>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+
+          <ItemsControl x:Name="BarChart" Height="92">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="9"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Bottom" Height="88">
+                  <Rectangle Width="9" Height="{Binding CpuH}" Fill="{DynamicResource IconPurpleBrush}"
+                             RadiusX="3" RadiusY="3" VerticalAlignment="Bottom"/>
+                  <Rectangle Width="9" Height="{Binding MemH}" Fill="{DynamicResource IconBlueBrush}"
+                             RadiusX="3" RadiusY="3" VerticalAlignment="Bottom"/>
+                  <Rectangle Width="9" Height="{Binding DiskH}" Fill="{DynamicResource IconGreenBrush}"
+                             RadiusX="3" RadiusY="3" VerticalAlignment="Bottom"/>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Grid ColumnDefinitions="*,Auto,*">
+            <TextBlock x:Name="ChartFrom" Classes="sub" Text=""/>
+            <TextBlock Grid.Column="1" Classes="sub" Text="CPU 紫 · 内存 蓝 · 磁盘 绿"/>
+            <TextBlock Grid.Column="2" Classes="sub" Text="现在" HorizontalAlignment="Right"
+                       Foreground="{DynamicResource LimeBrush}"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- 进程（Transactions 式） -->
+      <Border Classes="card">
+        <StackPanel Spacing="4">
+          <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+            <TextBlock Text="进程" Classes="cardtitle" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+              <Button x:Name="BtnStartAll" Content="启动全部"/>
+              <Button x:Name="BtnApplyRestart" Content="应用配置重启"/>
+            </StackPanel>
+          </Grid>
+
+          <TextBlock x:Name="ProcBanner" Text="" TextWrapping="Wrap" FontSize="12" IsVisible="False"
+                     Foreground="{DynamicResource IconAmberBrush}" Margin="0,4,0,4"/>
+
+          <ItemsControl x:Name="ProcList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Classes="row">
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="13">
+                      <Border Width="38" Height="38" CornerRadius="19" Background="{Binding IconBg}">
+                        <TextBlock Text="{Binding IconGlyph}" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{Binding IconFg}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                      </Border>
+                      <StackPanel VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AppTextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding SubLine}" FontSize="11"
+                                   Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+                      </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,16,0">
+                      <TextBlock Text="{Binding MemText}" FontSize="14" FontWeight="Bold"
+                                 Foreground="{DynamicResource LimeBrush}"
+                                 FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                                 HorizontalAlignment="Right"/>
+                      <TextBlock Text="{Binding CpuText}" FontSize="10"
+                                 Foreground="{DynamicResource AppTextTertiaryBrush}"
+                                 HorizontalAlignment="Right" Margin="0,1,0,0"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="2" Classes="pill" Background="{Binding PillBg}" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Status}" FontSize="10.5" FontWeight="SemiBold"
+                                 Foreground="{Binding PillFg}"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="3" Classes="actions" Orientation="Horizontal" Spacing="6"
+                                VerticalAlignment="Center" Margin="14,0,0,0">
+                      <Button Content="重启" Tag="restart" Click="OnAction" Padding="10,3"/>
+                      <Button Content="停止" Tag="stop" Click="OnAction" Padding="10,3"/>
+                      <Button Content="删除" Tag="delete" Click="OnAction" Padding="10,3"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <TextBlock TextWrapping="Wrap" FontSize="11.5" Margin="0,6,0,0"
+                     Foreground="{DynamicResource AppTextTertiaryBrush}"
+                     Text="悬停进程行出现操作按钮。「应用配置重启」执行 pm2 restart ecosystem.config.js --update-env——改完 .env 必须走这个，普通 restart 保留旧环境变量，不会生效。"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

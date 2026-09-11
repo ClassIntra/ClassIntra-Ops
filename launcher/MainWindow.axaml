@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClassIntraOps.Launcher.MainWindow"
+        Title="ClassIntraOps · CI 运维控制台"
+        Width="1180" Height="760"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBackgroundBrush}"
+        FontFamily="Microsoft YaHei UI, Segoe UI, Noto Sans CJK SC, sans-serif">
+
+  <Grid ColumnDefinitions="64,*">
+
+    <!-- ================= 窄图标侧栏 ================= -->
+    <Border Background="{DynamicResource AppSidebarBrush}"
+            BorderBrush="{DynamicResource AppDividerBrush}"
+            BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+
+        <!-- 品牌块：渐变 -->
+        <Border Width="32" Height="32" CornerRadius="9" Background="{DynamicResource BrandGradientBrush}"
+                HorizontalAlignment="Center" Margin="0,16,0,14" ToolTip.Tip="ClassIntraOps">
+          <TextBlock Text="CI" FontWeight="Bold" FontSize="12" Foreground="White"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- 图标导航 -->
+        <ListBox x:Name="NavList" Grid.Row="1" SelectionMode="Single" Margin="10,0"
+                 HorizontalAlignment="Stretch">
+          <ListBoxItem Tag="overview" IsSelected="True" ToolTip.Tip="总览" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
+          </ListBoxItem>
+          <ListBoxItem Tag="secrets" ToolTip.Tip="密钥配置" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M12 2a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z"/>
+          </ListBoxItem>
+          <ListBoxItem Tag="peers" ToolTip.Tip="跨班对端" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M7 7h10l-3-3 1.5-1.5L21 8l-5.5 5.5L14 12l3-3H7zM17 17H7l3 3-1.5 1.5L3 16l5.5-5.5L10 12l-3 3h10z"/>
+          </ListBoxItem>
+          <ListBoxItem Tag="install" ToolTip.Tip="安装更新" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M11 3h2v10l4-4 1.4 1.4L12 16.8 5.6 10.4 7 9l4 4zM4 19h16v2H4z"/>
+          </ListBoxItem>
+          <ListBoxItem Tag="logs" ToolTip.Tip="服务日志" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M6 2h9l5 5v15H6zM14 3.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/>
+          </ListBoxItem>
+          <ListBoxItem Tag="settings" ToolTip.Tip="环境设置" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M4 7h16v2H4zm0 8h16v2H4zm4-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm8-4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+          </ListBoxItem>
+        </ListBox>
+
+        <!-- 底部版本 -->
+        <TextBlock Grid.Row="2" Text="v1.0" FontSize="10" TextAlignment="Center"
+                   Foreground="{DynamicResource AppTextDisabledBrush}"/>
+      </Grid>
+    </Border>
+
+    <!-- ================= 内容区 ================= -->
+    <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
+
+      <!-- 顶栏：页标题 + 全局状态胶囊 -->
+      <Border Padding="24,14,24,12"
+              BorderBrush="{DynamicResource AppDividerBrush}"
+              BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock x:Name="PageTitle" Classes="h1" Text="总览" VerticalAlignment="Center"/>
+          <Border Grid.Column="1" Classes="pill"
+                  Background="{DynamicResource AppCardBrush}"
+                  BorderBrush="{DynamicResource AppCardBorderBrush}"
+                  BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <Ellipse x:Name="CiStatusDot" Width="7" Height="7" Fill="Gray" VerticalAlignment="Center"/>
+              <TextBlock x:Name="CiStatusText" Text="定位 CI 仓库…" FontSize="11.5"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Border>
+
+      <!-- 页面 -->
+      <ContentControl x:Name="PageHost" Grid.Row="1" Margin="24,16,24,4"/>
+
+      <!-- 状态栏 -->
+      <Border Grid.Row="2" Padding="24,7"
+              BorderBrush="{DynamicResource AppDividerBrush}"
+              BorderThickness="0,1,0,0">
+        <StackPanel Orientation="Horizontal" Spacing="20">
+          <TextBlock x:Name="StatusCi" Text="" FontSize="10.5"
+                     Foreground="{DynamicResource AppTextDisabledBrush}"/>
+          <TextBlock x:Name="StatusNet" Text="" FontSize="10.5"
+                     Foreground="{DynamicResource AppTextDisabledBrush}"/>
+          <TextBlock x:Name="StatusRefresh" Text="" FontSize="10.5"
+                     Foreground="{DynamicResource AppTextDisabledBrush}"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

@@ -1,0 +1,13 @@
+# Node
+node_modules/
+
+# 运行时生成
+ops-server/config.json
+
+# .NET
+bin/
+obj/
+publish/
+
+# 临时
+*.log

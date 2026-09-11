@@ -1,0 +1,156 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClassIntraOps.Launcher.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- 品牌 accent：蓝紫 -->
+            <Color x:Key="SystemAccentColor">#6366F1</Color>
+            <Color x:Key="SystemAccentColorDark1">#5254D6</Color>
+            <Color x:Key="SystemAccentColorDark2">#4343BD</Color>
+            <Color x:Key="SystemAccentColorDark3">#34349E</Color>
+            <Color x:Key="SystemAccentColorLight1">#7B7DF3</Color>
+            <Color x:Key="SystemAccentColorLight2">#9B9CF7</Color>
+            <Color x:Key="SystemAccentColorLight3">#BFBFFA</Color>
+
+            <!-- 产品级深色底色 -->
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0B0C10"/>
+            <SolidColorBrush x:Key="AppSidebarBrush" Color="#0F1014"/>
+            <SolidColorBrush x:Key="AppCardBrush" Color="#14161B"/>
+            <SolidColorBrush x:Key="AppCardBorderBrush" Color="#22252D"/>
+            <SolidColorBrush x:Key="AppDividerBrush" Color="#1E2129"/>
+            <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#F3F4F6"/>
+            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#9CA3AF"/>
+            <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="#6B7280"/>
+            <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#4B5563"/>
+
+            <!-- 多彩图标系（半透明圆底 + 亮色图标） -->
+            <SolidColorBrush x:Key="IconPurpleBrush" Color="#8B5CF6"/>
+            <SolidColorBrush x:Key="IconPurpleBgBrush" Color="#2E8B5CF6"/>
+            <SolidColorBrush x:Key="IconBlueBrush" Color="#3B82F6"/>
+            <SolidColorBrush x:Key="IconBlueBgBrush" Color="#2E3B82F6"/>
+            <SolidColorBrush x:Key="IconGreenBrush" Color="#10B981"/>
+            <SolidColorBrush x:Key="IconGreenBgBrush" Color="#2E10B981"/>
+            <SolidColorBrush x:Key="IconAmberBrush" Color="#F59E0B"/>
+            <SolidColorBrush x:Key="IconAmberBgBrush" Color="#2EF59E0B"/>
+
+            <!-- lime 高亮点缀 -->
+            <SolidColorBrush x:Key="LimeBrush" Color="#A3E635"/>
+            <SolidColorBrush x:Key="LimeBgBrush" Color="#26A3E635"/>
+
+            <!-- 语义状态色（替代 Fluent SystemFillColor，Semi 下不再依赖） -->
+            <SolidColorBrush x:Key="OkBgBrush" Color="#26A3E635"/>
+            <SolidColorBrush x:Key="OkFgBrush" Color="#A3E635"/>
+            <SolidColorBrush x:Key="WarnBgBrush" Color="#633806"/>
+            <SolidColorBrush x:Key="WarnFgBrush" Color="#FBBF24"/>
+            <SolidColorBrush x:Key="ErrBgBrush" Color="#791F1F"/>
+            <SolidColorBrush x:Key="ErrFgBrush" Color="#F87171"/>
+            <SolidColorBrush x:Key="NeutralBgBrush" Color="#2A2E37"/>
+            <SolidColorBrush x:Key="NeutralFgBrush" Color="#9AA2B0"/>
+
+            <!-- 品牌渐变 -->
+            <LinearGradientBrush x:Key="BrandGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#6366F1" Offset="0"/>
+                <GradientStop Color="#A855F7" Offset="1"/>
+            </LinearGradientBrush>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <!-- Semi Design 主题：接管所有基础控件质感（按钮/输入框/滚动条/工具提示等） -->
+        <StyleInclude Source="avares://Semi.Avalonia/Index.axaml"/>
+
+        <!-- 主操作按钮：自包含样式，含 hover/pressed 模板覆盖 -->
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="#6366F1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#7B7DF3"/>
+        </Style>
+        <Style Selector="Button.accent:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#5254D6"/>
+        </Style>
+
+        <!-- 卡片 -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource AppCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+
+        <Style Selector="Border.stat">
+            <Setter Property="Background" Value="{DynamicResource AppCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="16,15"/>
+        </Style>
+
+        <!-- 状态胶囊 / chip -->
+        <Style Selector="Border.pill">
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+
+        <!-- 表格行 -->
+        <Style Selector="Border.row">
+            <Setter Property="BorderBrush" Value="{DynamicResource AppDividerBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="0,10"/>
+        </Style>
+        <Style Selector="Border.row:pointerover">
+            <Setter Property="Background" Value="#141821"/>
+        </Style>
+
+        <!-- 行内操作：悬停才浮现（不挤占布局） -->
+        <Style Selector="Border.row StackPanel.actions">
+            <Setter Property="Opacity" Value="0"/>
+        </Style>
+        <Style Selector="Border.row:pointerover StackPanel.actions">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+
+        <!-- 文字层级 -->
+        <Style Selector="TextBlock.h1">
+            <Setter Property="FontSize" Value="19"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.cardtitle">
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.k">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.v">
+            <Setter Property="FontSize" Value="23"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.sub">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextTertiaryBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.mono">
+            <Setter Property="FontFamily" Value="Consolas, DejaVu Sans Mono, monospace"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <!-- 图标圆底 -->
+        <Style Selector="Border.iconbadge">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="CornerRadius" Value="11"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+    </Application.Styles>
+</Application>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClassIntraOps · CI 运维控制台</title>
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --border:#e3e2dd; --border-strong:#cfcdc6;
+  --text:#2c2c2a; --muted:#6b6a65; --accent:#185fa5; --accent-soft:#e6f1fb;
+  --ok:#0f6e56; --ok-soft:#e1f5ee; --warn:#854f0b; --warn-soft:#faeeda;
+  --err:#a32d2d; --err-soft:#fcebeb;
+  --radius:10px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+header{display:flex;align-items:center;gap:16px;padding:14px 24px;background:var(--panel);
+  border-bottom:1px solid var(--border);flex-wrap:wrap}
+.brand{font-weight:600;font-size:15px}
+.brand span{color:var(--muted);font-weight:400;margin-left:8px;font-size:12px}
+.meta{margin-left:auto;display:flex;gap:14px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--border-strong);margin-right:6px}
+.dot.ok{background:var(--ok)} .dot.err{background:var(--err)}
+nav{display:flex;gap:2px;padding:0 24px;background:var(--panel);border-bottom:1px solid var(--border)}
+nav button{border:none;background:none;padding:10px 16px;font-size:13px;color:var(--muted);
+  cursor:pointer;border-bottom:2px solid transparent}
+nav button:hover{color:var(--text)}
+nav button.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+main{padding:20px 24px;max-width:1180px}
+section{display:none} section.active{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px;margin-bottom:16px}
+.card h3{margin:0 0 12px;font-size:13px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-size:19px;font-weight:500;margin-top:2px}
+.stat .sub{font-size:11px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:500;font-size:12px}
+tr:last-child td{border-bottom:none}
+button.act{border:1px solid var(--border-strong);background:var(--panel);color:var(--text);
+  border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
+button.act:hover{border-color:var(--accent);color:var(--accent)}
+button.act.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.act.primary:hover{opacity:.9;color:#fff}
+button.act.danger:hover{border-color:var(--err);color:var(--err)}
+button.act:disabled{opacity:.45;cursor:not-allowed}
+input,select{font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--border-strong);
+  border-radius:6px;background:#fff;color:var(--text)}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+input[type=text].wide{width:100%}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;
+  font-family:var(--mono)}
+.field .hint{font-size:11px;color:var(--muted);margin-top:3px}
+.field input{width:100%}
+.group{margin-bottom:8px}
+.group h4{margin:16px 0 4px;font-size:13px;font-weight:600}
+.group .desc{font-size:12px;color:var(--muted);margin-bottom:10px}
+pre{background:#fbfbfa;border:1px solid var(--border);border-radius:8px;padding:12px;
+  font-family:var(--mono);font-size:12px;line-height:1.5;overflow:auto;max-height:420px;
+  white-space:pre-wrap;word-break:break-all;margin:0}
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;
+  background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.err{background:var(--err-soft);color:var(--err)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+.banner{border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+.banner.err{background:var(--err-soft);color:var(--err)}
+.banner.ok{background:var(--ok-soft);color:var(--ok)}
+.step{border-left:2px solid var(--border);padding-left:12px;margin-bottom:14px}
+.step.running{border-left-color:var(--accent)}
+.step.done{border-left-color:var(--ok)}
+.step.failed{border-left-color:var(--err)}
+.step .t{font-size:13px;font-weight:500}
+.step .c{font-family:var(--mono);font-size:11px;color:var(--muted);word-break:break-all}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">ClassIntraOps<span>CI 运维控制台</span></div>
+  <div class="meta">
+    <span id="m-host">—</span>
+    <span id="m-root">—</span>
+    <span id="m-refresh">—</span>
+  </div>
+</header>
+
+<nav>
+  <button data-tab="overview" class="active">总览</button>
+  <button data-tab="env">环境</button>
+  <button data-tab="secrets">密钥</button>
+  <button data-tab="peers">跨班</button>
+  <button data-tab="install">安装</button>
+  <button data-tab="logs">日志</button>
+</nav>
+
+<main>
+  <section id="overview" class="active">
+    <div id="ov-banner"></div>
+    <div class="grid" id="ov-stats"></div>
+    <div class="card" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">PM2 进程</h3>
+        <div class="row">
+          <button class="act primary" id="btn-start-all">启动全部</button>
+          <button class="act" id="btn-restart-env">应用配置重启</button>
+          <button class="act" id="btn-refresh">刷新</button>
+        </div>
+      </div>
+      <table id="ov-proc"><tbody></tbody></table>
+      <div class="note">「应用配置重启」会执行 <code>pm2 restart ecosystem.config.js --update-env</code>——改完 .env 必须走这个，普通的 <code>pm2 restart &lt;name&gt;</code> 保留旧环境变量，不生效。</div>
+    </div>
+  </section>
+
+  <section id="env">
+    <div class="card">
+      <h3>命令行工具</h3>
+      <table id="env-tools"><tbody></tbody></table>
+    </div>
+    <div class="card">
+      <h3>CI 仓库位置</h3>
+      <div class="row">
+        <input type="text" class="wide" id="env-root" style="flex:1;min-width:280px" placeholder="D:/NetWork/Integration/ClassIntra">
+        <button class="act primary" id="btn-save-root">保存</button>
+      </div>
+      <div class="note">判定依据：该目录下同时存在 <code>ecosystem.config.js</code> 与 <code>server/</code>。</div>
+    </div>
+    <div class="card">
+      <h3>连接信息</h3>
+      <div id="env-net" class="note"></div>
+    </div>
+  </section>
+
+  <section id="secrets">
+    <div class="banner warn">密钥字段不会回显明文。留空即表示不修改；填写后才会覆盖写入 <code>server/.env</code>。保存前会自动备份为 <code>.env.bak-&lt;时间戳&gt;</code>。</div>
+    <div id="sec-banner"></div>
+    <div class="card" id="sec-form">
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <h3 style="margin:0">环境变量</h3>
+        <div class="row">
+          <button class="act" id="btn-toggle-secret">显示全部明文</button>
+          <button class="act primary" id="btn-save-env">保存并提示重启</button>
+        </div>
+      </div>
+      <div id="sec-groups"></div>
+    </div>
+  </section>
+
+  <section id="peers">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">跨班对端</h3>
+        <button class="act" id="btn-probe">重新探活</button>
+      </div>
+      <div id="peer-summary" class="note" style="margin-bottom:10px"></div>
+      <table id="peer-table"><tbody></tbody></table>
+      <div class="note">探活逻辑：只要能收到任意 HTTP 状态码即视为在线。WS 端点常返回 426，那恰恰说明服务活着。</div>
+    </div>
+    <div class="card">
+      <h3>临时探活</h3>
+      <div class="row">
+        <input type="text" class="wide" id="probe-input" style="flex:1;min-width:260px" placeholder="100.115.93.90:10011">
+        <button class="act" id="btn-probe-one">探测</button>
+      </div>
+      <pre id="probe-out" style="margin-top:10px;max-height:160px"></pre>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="card">
+      <h3>从 GitHub 安装 / 更新 CI</h3>
+      <div class="field"><label>仓库地址</label><input type="text" id="ins-repo"></div>
+      <div class="field"><label>分支或标签</label><input type="text" id="ins-ref"></div>
+      <div class="field"><label>目标目录</label><input type="text" id="ins-dir"></div>
+      <div class="row">
+        <label><input type="checkbox" id="ins-clone" checked> 拉取源码</label>
+        <label><input type="checkbox" id="ins-install" checked> 安装依赖</label>
+        <label><input type="checkbox" id="ins-build" checked> 构建前端</label>
+        <label><input type="checkbox" id="ins-start" checked> 启动并注册</label>
+        <select id="ins-pm"><option value="pnpm">pnpm</option><option value="npm">npm</option></select>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="act primary" id="btn-install">开始</button>
+        <button class="act" id="btn-install-stop" disabled>中止</button>
+      </div>
+      <div class="note">每步输出实时回显。任一步失败即停并保留现场，不自动回滚——避免把你已有的部署搞坏。</div>
+    </div>
+    <div class="card"><h3>执行过程</h3><div id="ins-steps"></div></div>
+  </section>
+
+  <section id="logs">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">服务日志</h3>
+        <div class="row">
+          <select id="log-file"><option value="out">server-out.log</option><option value="error">server-error.log</option></select>
+          <button class="act" id="btn-log">读取</button>
+        </div>
+      </div>
+      <pre id="log-out">点击「读取」加载日志尾部。</pre>
+    </div>
+  </section>
+</main>
+
+<script>
+'use strict';
+var $ = function (s) { return document.querySelector(s); };
+var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+function api(path, opts) {
+  return fetch(path, opts).then(function (r) {
+    return r.json().catch(function () { return { ok: false, error: '响应不是 JSON' }; });
+  });
+}
+function post(path, body) {
+  return api(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body || {})
+  });
+}
+function fmtBytes(n) {
+  if (n === null || n === undefined) return '—';
+  var u = ['B', 'KB', 'MB', 'GB', 'TB'], i = 0;
+  while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return n.toFixed(i === 0 ? 0 : 1) + ' ' + u[i];
+}
+function fmtDuration(ms) {
+  if (!ms && ms !== 0) return '—';
+  var s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+  if (d > 0) return d + '天' + (h % 24) + '小时';
+  if (h > 0) return h + '小时' + (m % 60) + '分';
+  if (m > 0) return m + '分' + (s % 60) + '秒';
+  return s + '秒';
+}
+
+// ---------------------------------------------------------------- Tab
+$$('nav button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    $$('nav button').forEach(function (x) { x.classList.remove('active'); });
+    $$('main section').forEach(function (x) { x.classList.remove('active'); });
+    b.classList.add('active');
+    $('#' + b.getAttribute('data-tab')).classList.add('active');
+    if (b.getAttribute('data-tab') === 'secrets' && !secretsLoaded) loadSecrets();
+    if (b.getAttribute('data-tab') === 'peers') loadPeers();
+  });
+});
+
+// ---------------------------------------------------------------- 配置
+var CONFIG = {};
+
+function loadConfig() {
+  return api('/api/config').then(function (r) {
+    CONFIG = r;
+    $('#m-host').textContent = 'http://' + r.host + ':' + r.port;
+    $('#m-root').innerHTML = '<span class="dot ' + (r.ciRootValid ? 'ok' : 'err') + '"></span>' + (r.ciRoot || '未定位到 CI 仓库');
+    $('#env-root').value = r.ciRoot || '';
+    $('#ins-repo').value = r.repo || '';
+    $('#ins-ref').value = r.ref || '';
+    if (!$('#ins-dir').value) $('#ins-dir').value = r.ciRoot || '';
+    $('#env-net').textContent = '平台 ' + r.platform + '，本机地址 ' + (r.ips || []).join('、') + '。当前监听 ' + r.host + ':' + r.port + (r.tokenEnabled ? '，已启用 token' : '');
+    if (!r.ciRootValid) {
+      $('#ov-banner').innerHTML = '<div class="banner err">未定位到 CI 仓库，请到「环境」页设置路径。</div>';
+    } else {
+      $('#ov-banner').innerHTML = '';
+    }
+  });
+}
+
+$('#btn-save-root').addEventListener('click', function () {
+  post('/api/config', { ciRoot: $('#env-root').value.trim() }).then(function (r) {
+    if (!r.ok) { alert('保存失败: ' + r.error); return; }
+    loadConfig();
+  });
+});
+
+// ---------------------------------------------------------------- 总览
+function loadSystem() {
+  return api('/api/system').then(function (r) {
+    if (!r.ok) return;
+    var s = r.system;
+    $('#ov-stats').innerHTML = [
+      stat('CPU', (s.cpu.usage * 100).toFixed(0) + '%', s.cpu.cores + ' 核 · ' + (s.cpu.model || '').slice(0, 28)),
+      stat('内存', (s.memory.usage * 100).toFixed(0) + '%', fmtBytes(s.memory.used) + ' / ' + fmtBytes(s.memory.total)),
+      stat('磁盘', s.disk ? (((s.disk.total - s.disk.free) / s.disk.total * 100).toFixed(0) + '%') : '—',
+        s.disk ? (fmtBytes(s.disk.total - s.disk.free) + ' 已用') : '不可用'),
+      stat('运行时长', fmtDuration(s.uptime * 1000), s.hostname)
+    ].join('');
+  });
+}
+function stat(k, v, sub) {
+  return '<div class="stat"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + '</div><div class="sub">' + esc(sub || '') + '</div></div>';
+}
+function esc(s) {
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function loadProcesses() {
+  return api('/api/pm2/status').then(function (r) {
+    var tb = $('#ov-proc').querySelector('tbody');
+    if (!r.ok) {
+      tb.innerHTML = '<tr><td class="note">PM2 不可用: ' + esc(r.error || '') + '</td></tr>';
+      return;
+    }
+    if (!r.processes.length) {
+      tb.innerHTML = '<tr><td class="note">当前没有 PM2 进程。</td></tr>';
+      return;
+    }
+    tb.innerHTML = r.processes.map(function (p) {
+      var st = p.status === 'online'
+        ? '<span class="tag ok">online</span>'
+        : '<span class="tag ' + (p.status === 'errored' ? 'err' : 'warn') + '">' + esc(p.status || 'unknown') + '</span>';
+      return '<tr><td>' + esc(p.name) + '</td><td>' + st + '</td><td>' + (p.pid || '—') + '</td>' +
+        '<td>' + (p.cpu === undefined ? '—' : p.cpu + '%') + '</td>' +
+        '<td>' + fmtBytes(p.memory) + '</td>' +
+        '<td>' + (p.restarts || 0) + '</td>' +
+        '<td>' + fmtDuration(p.uptime) + '</td>' +
+        '<td class="row">' +
+        '<button class="act" data-p="' + esc(p.name) + '" data-a="restart">重启</button>' +
+        '<button class="act" data-p="' + esc(p.name) + '" data-a="stop">停止</button>' +
+        '<button class="act danger" data-p="' + esc(p.name) + '" data-a="delete">删除</button>' +
+        '</td></tr>';
+    }).join('');
+    $$('#ov-proc button[data-a]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        post('/api/pm2/action', { name: b.getAttribute('data-p'), action: b.getAttribute('data-a') })
+          .then(function (r2) { if (!r2.ok) alert('执行失败: ' + (r2.error || r2.stderr || '')); loadProcesses(); });
+      });
+    });
+    $('#m-refresh').textContent = '更新于 ' + new Date().toLocaleTimeString();
+  });
+}
+
+$('#btn-refresh').addEventListener('click', function () { loadSystem(); loadProcesses(); });
+$('#btn-start-all').addEventListener('click', function () {
+  post('/api/pm2/start-all', {}).then(function (r) {
+    if (!r.ok) alert('启动失败: ' + (r.error || r.stderr || ''));
+    loadProcesses();
+  });
+});
+$('#btn-restart-env').addEventListener('click', function () {
+  if (!confirm('将执行 pm2 restart ecosystem.config.js --update-env，服务会短暂中断。继续？')) return;
+  post('/api/pm2/restart-env', {}).then(function (r) {
+    if (!r.ok) alert('重启失败: ' + (r.error || r.stderr || ''));
+    loadProcesses();
+  });
+});
+
+// ---------------------------------------------------------------- 环境
+function loadTools() {
+  return api('/api/env/detect').then(function (r) {
+    if (!r.ok) return;
+    var names = { node: 'Node.js', pnpm: 'pnpm', npm: 'npm', git: 'Git', pm2: 'PM2' };
+    $('#env-tools').querySelector('tbody').innerHTML = Object.keys(r.tools).map(function (k) {
+      var t = r.tools[k];
+      return '<tr><td>' + (names[k] || k) + '</td><td>' +
+        (t.available ? '<span class="tag ok">可用</span>' : '<span class="tag err">缺失</span>') +
+        '</td><td style="font-family:var(--mono);font-size:12px">' + esc(t.version || '') + '</td></tr>';
+    }).join('');
+  });
+}
+
+// ---------------------------------------------------------------- 密钥
+var secretsLoaded = false, showPlain = false, SCHEMA = null;
+
+function loadSecrets() {
+  return api('/api/env/schema').then(function (r) {
+    if (!r.ok) {
+      $('#sec-groups').innerHTML = '<div class="banner err">' + esc(r.error) + '</div>';
+      return;
+    }
+    secretsLoaded = true;
+    SCHEMA = r;
+    renderSecrets();
+  });
+}
+
+function renderSecrets() {
+  var cur = (SCHEMA.current && SCHEMA.current.values) || {};
+  var masked = (SCHEMA.current && SCHEMA.current.masked) || {};
+  var html = SCHEMA.schema.groups.map(function (g) {
+    return '<div class="group"><h4>' + esc(g.title) + '</h4>' +
+      (g.description ? '<div class="desc">' + esc(g.description) + '</div>' : '') +
+      g.fields.map(function (f) { return renderField(f, cur, masked); }).join('') +
+      '</div>';
+  }).join('');
+
+  if (SCHEMA.schema.extraKeys && SCHEMA.schema.extraKeys.length) {
+    html += '<div class="group"><h4>仅出现在 ecosystem.config.js 的键</h4>' +
+      '<div class="desc">这些键在 .env.example 里没有，通常由部署配置注入，一般不需要手工填。</div>' +
+      SCHEMA.schema.extraKeys.map(function (f) { return renderField(f, cur, masked); }).join('') + '</div>';
+  }
+  $('#sec-groups').innerHTML = html;
+}
+
+function renderField(f, cur, masked) {
+  var val = cur[f.key];
+  var has = val !== undefined && val !== '';
+  var inputType = (f.secret && !showPlain) ? 'password' : 'text';
+  var placeholder = f.secret
+    ? (has ? '已设置 ' + (masked[f.key] || '').slice(-6) + '（留空不修改）' : '未设置')
+    : (f.defaultValue || '');
+  var value = f.secret ? '' : (has ? val : '');
+  return '<div class="field">' +
+    '<label>' + esc(f.key) + (f.secret ? ' <span class="tag">密钥</span>' : '') + '</label>' +
+    '<input type="' + inputType + '" data-key="' + esc(f.key) + '" data-secret="' + (f.secret ? '1' : '0') + '" ' +
+    'value="' + esc(value) + '" placeholder="' + esc(placeholder) + '">' +
+    (f.hint ? '<div class="hint">' + esc(f.hint) + '</div>' : '') +
+    '</div>';
+}
+
+$('#btn-toggle-secret').addEventListener('click', function () {
+  showPlain = !showPlain;
+  this.textContent = showPlain ? '隐藏明文' : '显示全部明文';
+  if (SCHEMA) renderSecrets();
+});
+
+$('#btn-save-env').addEventListener('click', function () {
+  var values = {};
+  $$('#sec-groups input[data-key]').forEach(function (i) {
+    var v = i.value;
+    // 密钥字段留空 = 不修改；非密钥字段允许清空
+    if (i.getAttribute('data-secret') === '1' && v === '') return;
+    values[i.getAttribute('data-key')] = v;
+  });
+  if (Object.keys(values).length === 0) { alert('没有需要保存的改动。'); return; }
+  post('/api/env/values', { values: values }).then(function (r) {
+    if (!r.ok) {
+      $('#sec-banner').innerHTML = '<div class="banner err">保存失败: ' + esc(r.error) + '</div>';
+      return;
+    }
+    $('#sec-banner').innerHTML = '<div class="banner ok">已写入 ' + esc(String(r.updated ? r.updated.length : 0)) +
+      ' 项。改动要生效需执行「应用配置重启」——普通 restart 不会刷新环境变量。</div>';
+    secretsLoaded = false;
+    loadSecrets();
+  });
+});
+
+// ---------------------------------------------------------------- 跨班
+function loadPeers() {
+  return api('/api/peers').then(function (r) {
+    if (!r.ok) {
+      $('#peer-summary').innerHTML = '<span class="tag err">' + esc(r.error) + '</span>';
+      return;
+    }
+    $('#peer-summary').innerHTML = '本机 ID <b>' + esc(r.serverId || '未设置') + '</b> · ' +
+      '已配置 ' + r.total + ' 个对端，在线 <b>' + r.online + '</b> 个' +
+      (r.relayEnabled ? ' · <span class="tag ok">已配置 RELAY_SECRET</span>' : ' · <span class="tag warn">未配置 RELAY_SECRET</span>');
+    var tb = $('#peer-table').querySelector('tbody');
+    if (!r.peers.length) {
+      tb.innerHTML = '<tr><td class="note">RELAY_SERVERS 为空，当前是单机模式。</td></tr>';
+      return;
+    }
+    tb.innerHTML = r.peers.map(function (p) {
+      // 状态码是补充信息：relay 端点常不响应普通 GET，此时以 TCP 握手结果为准
+      var detail = p.status ? ('HTTP ' + p.status) : 'TCP 连通';
+      var tag = p.ok
+        ? '<span class="tag ok">在线 · ' + esc(detail) + '</span>'
+        : '<span class="tag err">不可达 · ' + esc(p.error || '') + '</span>';
+      return '<tr><td style="font-family:var(--mono);font-size:12px">' + esc(p.url) + '</td><td>' + tag +
+        '</td><td>' + esc(String(p.host || '')) + ':' + esc(String(p.port || '')) +
+        '</td><td>' + (p.ms === undefined ? '—' : p.ms + ' ms') + '</td></tr>';
+    }).join('');
+  });
+}
+$('#btn-probe').addEventListener('click', loadPeers);
+$('#btn-probe-one').addEventListener('click', function () {
+  var v = $('#probe-input').value.trim();
+  if (!v) return;
+  $('#probe-out').textContent = '探测中…';
+  post('/api/peers/probe', { targets: [v], timeoutMs: 5000 }).then(function (r) {
+    $('#probe-out').textContent = JSON.stringify(r, null, 2);
+  });
+});
+
+// ---------------------------------------------------------------- 安装
+var installAbort = null;
+$('#btn-install').addEventListener('click', function () {
+  var body = {
+    repo: $('#ins-repo').value.trim(),
+    ref: $('#ins-ref').value.trim() || 'main',
+    dir: $('#ins-dir').value.trim(),
+    pkgManager: $('#ins-pm').value,
+    steps: []
+  };
+  if ($('#ins-clone').checked) body.steps.push('clone');
+  if ($('#ins-install').checked) body.steps.push('install');
+  if ($('#ins-build').checked) body.steps.push('build');
+  if ($('#ins-start').checked) body.steps.push('start');
+
+  $('#ins-steps').innerHTML = '';
+  $('#btn-install').disabled = true;
+  $('#btn-install-stop').disabled = false;
+  installAbort = new AbortController();
+
+  fetch('/api/install', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: installAbort.signal
+  }).then(function (resp) {
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder('utf-8');
+    var buf = '';
+    var nodes = {};
+
+    function node(name) {
+      if (!nodes[name]) {
+        var d = document.createElement('div');
+        d.className = 'step';
+        d.innerHTML = '<div class="t"></div><div class="c"></div><pre></pre>';
+        $('#ins-steps').appendChild(d);
+        nodes[name] = d;
+      }
+      return nodes[name];
+    }
+
+    function handle(obj) {
+      if (obj.type === 'begin') {
+        $('#ins-steps').innerHTML = '<div class="note">目标目录 ' + esc(obj.target) + ' · ' + esc(obj.repo) + ' @ ' + esc(obj.ref) + '</div>';
+        nodes = {};
+      } else if (obj.type === 'step' && obj.status === 'running') {
+        var n = node(obj.name);
+        n.className = 'step running';
+        n.querySelector('.t').textContent = obj.label || obj.name;
+        n.querySelector('.c').textContent = obj.command;
+      } else if (obj.type === 'output') {
+        var m = node(obj.step);
+        m.querySelector('pre').textContent += obj.chunk;
+        m.querySelector('pre').scrollTop = m.querySelector('pre').scrollHeight;
+      } else if (obj.type === 'step') {
+        var d = node(obj.name);
+        d.className = 'step ' + (obj.status === 'done' ? 'done' : 'failed');
+        d.querySelector('.t').textContent += obj.status === 'done' ? ' · 完成' : ' · 失败（退出码 ' + obj.code + '）';
+      } else if (obj.type === 'finish') {
+        $('#btn-install').disabled = false;
+        $('#btn-install-stop').disabled = true;
+        var b = document.createElement('div');
+        b.className = 'banner ' + (obj.ok ? 'ok' : 'err');
+        b.textContent = obj.ok ? '全部步骤完成。' : '在「' + obj.failedAt + '」步骤失败，已保留现场，未自动回滚。';
+        $('#ins-steps').appendChild(b);
+        loadProcesses();
+      }
+    }
+
+    function pump() {
+      return reader.read().then(function (r) {
+        if (r.done) return;
+        buf += decoder.decode(r.value, { stream: true });
+        var lines = buf.split('\n');
+        buf = lines.pop();
+        lines.forEach(function (l) {
+          if (!l.trim()) return;
+          try { handle(JSON.parse(l)); } catch (e) { /* 忽略坏行 */ }
+        });
+        return pump();
+      });
+    }
+    return pump();
+  }).catch(function (e) {
+    if (e.name !== 'AbortError') alert('安装失败: ' + e.message);
+    $('#btn-install').disabled = false;
+    $('#btn-install-stop').disabled = true;
+  });
+});
+$('#btn-install-stop').addEventListener('click', function () {
+  if (installAbort) installAbort.abort();
+});
+
+// ---------------------------------------------------------------- 日志
+$('#btn-log').addEventListener('click', function () {
+  api('/api/logs?file=' + $('#log-file').value + '&lines=300').then(function (r) {
+    if (!r.ok) { $('#log-out').textContent = '读取失败: ' + (r.error || ''); return; }
+    $('#log-out').textContent = r.lines.join('\n');
+    $('#log-out').scrollTop = $('#log-out').scrollHeight;
+  });
+});
+
+// ---------------------------------------------------------------- 启动
+loadConfig().then(function () {
+  loadSystem();
+  loadProcesses();
+  loadTools();
+  setInterval(function () { if (CONFIG.ciRootValid) { loadSystem(); loadProcesses(); } }, 8000);
+});
+</script>
+</body>
+</html>

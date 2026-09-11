@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClassIntraOps.Launcher.Views.PeersPage">
+  <ScrollViewer>
+    <StackPanel Spacing="14">
+
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="8">
+            <TextBlock x:Name="SummaryText" Text="读取中…" FontWeight="SemiBold" FontSize="13.5"/>
+            <TextBlock x:Name="DetailText" Text="" FontSize="11.5" Opacity="0.65" TextWrapping="Wrap"/>
+          </StackPanel>
+          <Button x:Name="BtnRefresh" Content="重新探活" Grid.Column="1" VerticalAlignment="Center" Padding="14,6"/>
+        </Grid>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="已配置对端（RELAY_SERVERS）" FontWeight="SemiBold" FontSize="13.5"/>
+          <StackPanel x:Name="PeerHost" Spacing="2"/>
+          <TextBlock TextWrapping="Wrap" FontSize="11.5" Opacity="0.65"
+                     Text="在线判定基于 TCP 握手：CI 的 relay 只在 /relay 路径响应（426），根路径会把 HTTP 探测挂到超时造成误判，所以这里不看 HTTP 状态码。"/>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="临时探活" FontWeight="SemiBold" FontSize="13.5"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox x:Name="ProbeInput" PlaceholderText="100.115.93.90:10011 或 ws://host:port/relay"/>
+            <Button x:Name="BtnProbe" Content="探测" Grid.Column="1" Margin="8,0,0,0" Padding="14,6"/>
+          </Grid>
+          <TextBox x:Name="ProbeOut" IsReadOnly="True" Height="130" FontFamily="Consolas, DejaVu Sans Mono, monospace" FontSize="12"
+                   TextWrapping="Wrap" AcceptsReturn="True"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

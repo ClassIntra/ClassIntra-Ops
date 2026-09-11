@@ -7,6 +7,46 @@
         Background="{DynamicResource AppBackgroundBrush}"
         FontFamily="Microsoft YaHei UI, Segoe UI, Noto Sans CJK SC, sans-serif">
 
+  <Window.Resources>
+    <!-- 侧栏导航项：完全自绘模板，选中态 = 圆角亮块 -->
+    <ControlTheme x:Key="NavItemTheme" TargetType="ListBoxItem">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border x:Name="Bd" Background="Transparent" CornerRadius="10"
+                  Height="40" Margin="10,2">
+            <ContentPresenter x:Name="IconHost" Content="{TemplateBinding Content}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              TextElement.Foreground="#6B7280"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover">
+        <Style Selector="^ /template/ Border#Bd">
+          <Setter Property="Background" Value="#141822"/>
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter#IconHost">
+          <Setter Property="TextElement.Foreground" Value="#C4C9D4"/>
+        </Style>
+      </Style>
+      <Style Selector="^:selected">
+        <Style Selector="^ /template/ Border#Bd">
+          <Setter Property="Background" Value="#1D2331"/>
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter#IconHost">
+          <Setter Property="TextElement.Foreground" Value="#E5E7EB"/>
+        </Style>
+      </Style>
+    </ControlTheme>
+  </Window.Resources>
+
+  <Window.Styles>
+    <Style Selector="ListBox#NavList">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+  </Window.Styles>
+
   <Grid ColumnDefinitions="64,*">
 
     <!-- ================= 窄图标侧栏 ================= -->
@@ -16,14 +56,15 @@
       <Grid RowDefinitions="Auto,*,Auto" Margin="0,0,0,12">
 
         <!-- 品牌块：渐变 -->
-        <Border Width="32" Height="32" CornerRadius="9" Background="{DynamicResource BrandGradientBrush}"
-                HorizontalAlignment="Center" Margin="0,16,0,14" ToolTip.Tip="ClassIntraOps">
+        <Border Width="34" Height="34" CornerRadius="10" Background="{DynamicResource BrandGradientBrush}"
+                HorizontalAlignment="Center" Margin="0,18,0,16" ToolTip.Tip="ClassIntraOps">
           <TextBlock Text="CI" FontWeight="Bold" FontSize="12" Foreground="White"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
 
         <!-- 图标导航 -->
-        <ListBox x:Name="NavList" Grid.Row="1" SelectionMode="Single" Margin="10,0"
+        <ListBox x:Name="NavList" Grid.Row="1" SelectionMode="Single" Margin="0"
+                 ItemContainerTheme="{StaticResource NavItemTheme}"
                  HorizontalAlignment="Stretch">
           <ListBoxItem Tag="overview" IsSelected="True" ToolTip.Tip="总览" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
@@ -55,7 +96,7 @@
     <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
 
       <!-- 顶栏：页标题 + 全局状态胶囊 -->
-      <Border Padding="24,14,24,12"
+      <Border Padding="26,16,26,13"
               BorderBrush="{DynamicResource AppDividerBrush}"
               BorderThickness="0,0,0,1">
         <Grid ColumnDefinitions="*,Auto">
@@ -74,20 +115,22 @@
       </Border>
 
       <!-- 页面 -->
-      <ContentControl x:Name="PageHost" Grid.Row="1" Margin="24,16,24,4"/>
+      <ContentControl x:Name="PageHost" Grid.Row="1" Margin="26,18,26,4"/>
 
       <!-- 状态栏 -->
-      <Border Grid.Row="2" Padding="24,7"
+      <Border Grid.Row="2" Padding="26,7"
               BorderBrush="{DynamicResource AppDividerBrush}"
               BorderThickness="0,1,0,0">
-        <StackPanel Orientation="Horizontal" Spacing="20">
-          <TextBlock x:Name="StatusCi" Text="" FontSize="10.5"
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Orientation="Horizontal" Spacing="20">
+            <TextBlock x:Name="StatusCi" Text="" FontSize="10.5"
+                       Foreground="{DynamicResource AppTextDisabledBrush}"/>
+            <TextBlock x:Name="StatusNet" Text="" FontSize="10.5"
+                       Foreground="{DynamicResource AppTextDisabledBrush}"/>
+          </StackPanel>
+          <TextBlock x:Name="StatusRefresh" Text="" FontSize="10.5" Grid.Column="1"
                      Foreground="{DynamicResource AppTextDisabledBrush}"/>
-          <TextBlock x:Name="StatusNet" Text="" FontSize="10.5"
-                     Foreground="{DynamicResource AppTextDisabledBrush}"/>
-          <TextBlock x:Name="StatusRefresh" Text="" FontSize="10.5"
-                     Foreground="{DynamicResource AppTextDisabledBrush}"/>
-        </StackPanel>
+        </Grid>
       </Border>
     </Grid>
   </Grid>

@@ -1,13 +1,14 @@
 """Full loop: kill -> build -> run -> wait for chart samples -> screenshot."""
 import os
 import subprocess
+import sys
 import time
 
 DOTNET = r"C:\Program Files\dotnet\dotnet.exe"
 PROJ = r"D:\NetWork\Integration\ClassIntraOps\launcher\ClassIntraOps.Launcher.csproj"
 EXE = r"D:\NetWork\Integration\ClassIntraOps\launcher\bin\Debug\net10.0\ClassIntraOps.exe"
 PY = r"C:\Users\iflytek\.workbuddy\binaries\python\versions\3.13.12\python.exe"
-SHOT = r"D:\NetWork\Integration\ClassIntraOps\selfcheck6.png"
+SHOT = r"D:\NetWork\Integration\ClassIntraOps\selfcheck7.png"
 
 os.system("taskkill /F /IM ClassIntraOps.exe >nul 2>&1")
 time.sleep(2)
@@ -22,4 +23,4 @@ if r.returncode != 0:
 
 subprocess.Popen(["cmd", "/c", "start", "", EXE], close_fds=True)
 time.sleep(75)
-subprocess.run([PY, r"D:\NetWork\Integration\ClassIntraOps\tools\grab.py", SHOT])
+subprocess.run([PY, r"D:\NetWork\Integration\ClassIntraOps\tools\grabwin.py", SHOT])

@@ -86,10 +86,10 @@ public static class Palette
     public static IBrush AccentBg => Accent;
 
     // 多彩图标系（App.axaml 同名资源；Transactions 式列表的圆底用）
-    public static readonly IBrush IconPurple = Res(("IconPurpleBrush", Color.FromRgb(0x8b, 0x5c, 0xf6)));
-    public static readonly IBrush IconBlue = Res(("IconBlueBrush", Color.FromRgb(0x3b, 0x82, 0xf6)));
-    public static readonly IBrush IconGreen = Res(("IconGreenBrush", Color.FromRgb(0x10, 0xb9, 0x81)));
-    public static readonly IBrush IconAmber = Res(("IconAmberBrush", Color.FromRgb(0xf5, 0x9e, 0x0b)));
+    public static readonly IBrush IconPurple = Res(("IconPurpleBrush", Color.FromRgb(0xa7, 0x8b, 0xfa)));
+    public static readonly IBrush IconBlue = Res(("IconBlueBrush", Color.FromRgb(0x60, 0xa5, 0xfa)));
+    public static readonly IBrush IconGreen = Res(("IconGreenBrush", Color.FromRgb(0x34, 0xd3, 0x99)));
+    public static readonly IBrush IconAmber = Res(("IconAmberBrush", Color.FromRgb(0xfb, 0xbf, 0x24)));
     public static readonly IBrush IconPurpleBg = Res(("IconPurpleBgBrush", Color.FromArgb(0x2e, 0x8b, 0x5c, 0xf6)));
     public static readonly IBrush IconBlueBg = Res(("IconBlueBgBrush", Color.FromArgb(0x2e, 0x3b, 0x82, 0xf6)));
     public static readonly IBrush IconGreenBg = Res(("IconGreenBgBrush", Color.FromArgb(0x2e, 0x10, 0xb9, 0x81)));
@@ -97,7 +97,11 @@ public static class Palette
 }
 
 /// <summary>柱状图单点：Label=时刻，*H=三色柱高度（px）。公开类型供 XAML x:DataType 编译绑定。</summary>
-public sealed record BarGroup(string Label, double CpuH, double MemH, double DiskH);
+public sealed record BarGroup(string Label, double CpuH, double MemH, double DiskH)
+{
+    /// <summary>空槽（滚动窗口左侧补位）不渲染柱体。</summary>
+    public bool HasBars => CpuH > 0 || MemH > 0 || DiskH > 0;
+}
 
 /// <summary>展示用的计算属性，直接给 DataTemplate 绑定。</summary>
 public partial class Pm2Process

@@ -67,14 +67,25 @@ public partial class OverviewPage : UserControl
         LivePill.Background = allOnline ? Palette.LimeBg : Palette.WarnBg;
         LiveText.Text = allOnline ? "LIVE" : "DEGRADED";
         LiveText.Foreground = allOnline ? Palette.Lime : Palette.WarnFg;
+        LiveDot.Fill = allOnline ? Palette.Lime : Palette.WarnFg;
 
-        // 柱状图
+        // 柱状图：固定 24 槽，新样本从右侧推入，不足补空槽（横向铺满，滚动窗口感）
+        CpuNow.Text = $"{Math.Clamp(sys.CpuUsage, 0, 1) * 100:0}%";
+        MemNow.Text = $"{Math.Clamp(sys.MemUsage, 0, 1) * 100:0}%";
+        DiskNow.Text = sys.Disk is { } dx && dx.Total > 0
+            ? $"{(double)(dx.Total - dx.Free) / dx.Total * 100:0}%"
+            : "—";
+        const int slots = 24;
         var samples = HistoryService.Snapshot();
-        BarChart.ItemsSource = samples.Select(s => new BarGroup(
+        var bars = new List<BarGroup>(slots);
+        for (var i = 0; i < slots - samples.Count; i++)
+            bars.Add(new BarGroup("", 0, 0, 0));
+        bars.AddRange(samples.Select(s => new BarGroup(
             s.Time.ToString("HH:mm"),
             Math.Max(3, s.Cpu * BarMaxHeight),
             Math.Max(3, s.Mem * BarMaxHeight),
-            Math.Max(3, s.Disk * BarMaxHeight))).ToList();
+            Math.Max(3, s.Disk * BarMaxHeight))));
+        BarChart.ItemsSource = bars;
         ChartFrom.Text = samples.Count > 0 ? samples[0].Time.ToString("HH:mm") : "";
 
         // 进程列表
@@ -87,6 +98,7 @@ public partial class OverviewPage : UserControl
         }
         ProcBanner.IsVisible = list.Count == 0;
         ProcBanner.Text = list.Count == 0 ? "当前没有 PM2 进程。" : "";
+        ProcCountText.Text = ok ? list.Count.ToString() : "0";
         ProcList.ItemsSource = list;
 
         if (VisualRoot is MainWindow main)

@@ -2,6 +2,8 @@
 
 ClassIntra（CI）的运维控制台。独立仓库，不依赖 CI 的任何模块。
 
+**主要面向零基础用户**：下载单文件、双击即用，全程图形界面完成「定位仓库 → 配置密钥 → 启动服务」，无需命令行与开发经验。开发者与需要本地调试的场景请走 [CI 快速开始](https://classintra.github.io/quick-start/)。
+
 > ⚠️ **测试版声明**：ClassIntraOps 当前处于 **v0.1 测试阶段**，功能与配置格式尚未稳定，后续版本可能包含**破坏性变更**（配置文件格式、日志位置、数据结构等）。升级前请备份 `ClassIntraOps.config.json`，并关注 [Releases](https://github.com/ClassIntra/ClassIntra-Ops/releases) 与 [CHANGELOG](CHANGELOG.md)。
 
 **下载**：[Releases](https://github.com/ClassIntra/ClassIntra-Ops/releases) 提供 Windows x64 自包含单文件（如 `ClassIntraOps-v0.1-win-x64.exe`，约 99MB），下载即用，无需安装 .NET。

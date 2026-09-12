@@ -11,3 +11,17 @@ publish/
 
 # 临时
 *.log
+
+# 本机配置（含 CI 仓库路径等，不随仓库分发）
+ClassIntraOps.config.json
+
+# 运行时日志与崩溃记录
+logs/
+
+# 自检截图（发布验证产物，不入库）
+/selfcheck*.png
+
+# IDE
+.vs/
+*.user
+/ClassIntraOps-v*-win-x64.zip

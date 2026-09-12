@@ -61,9 +61,15 @@ public static class Palette
     public static readonly IBrush TextTertiary = Res(("AppTextTertiaryBrush", Color.FromRgb(0x6B, 0x72, 0x80)),
         ("TextFillColorTertiaryBrush", Color.FromRgb(0x6B, 0x72, 0x80)));
 
-    public static readonly IBrush CardBg = Res(("AppCardBrush", Color.FromRgb(0x14, 0x16, 0x1B)));
-    public static readonly IBrush CardBorder = Res(("AppCardBorderBrush", Color.FromRgb(0x22, 0x25, 0x2D)));
-    public static readonly IBrush Divider = Res(("AppDividerBrush", Color.FromRgb(0x1E, 0x21, 0x29)));
+    public static readonly IBrush CardBg = Res(("AppCardBrush", Color.FromRgb(0x10, 0x13, 0x19)));
+    public static readonly IBrush CardBorder = Res(("AppCardBorderBrush", Color.FromRgb(0x1E, 0x23, 0x30)));
+    public static readonly IBrush Divider = Res(("AppDividerBrush", Color.FromRgb(0x17, 0x1B, 0x23)));
+
+    // 井面 / 抬升面 / accent 柔和态（精修新增，与 App.axaml 同名资源对齐）
+    public static readonly IBrush Well = Res(("AppWellBrush", Color.FromRgb(0x0A, 0x0C, 0x10)));
+    public static readonly IBrush Raised = Res(("AppRaisedBrush", Color.FromRgb(0x16, 0x1A, 0x21)));
+    public static readonly IBrush AccentSoftBg = Res(("AccentSoftBrush", Color.FromRgb(0x1E, 0x21, 0x40)));
+    public static readonly IBrush AccentSoftFg = Res(("AccentSoftFgBrush", Color.FromRgb(0xA5, 0xAC, 0xFF)));
 
     // lime 点缀（截图 chips 风）
     public static readonly IBrush LimeBg = Res(("LimeBgBrush", Color.FromArgb(0x26, 0xA3, 0xE6, 0x35)));

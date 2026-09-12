@@ -3,42 +3,248 @@
              x:Class="ClassIntraOps.Launcher.Views.OverviewPage">
 
   <ScrollViewer>
-    <StackPanel Spacing="14">
+    <StackPanel Spacing="12">
 
-      <!-- ═══ 大数字状态卡 ═══ -->
-      <Border Classes="card">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel>
-            <TextBlock Classes="overline" Text="CLASSINTRA 服务状态"/>
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
-              <TextBlock x:Name="OnlineCount" Classes="bignum" Text="—"/>
-              <TextBlock x:Name="OnlineTotal" Text="/ — 进程在线" FontSize="15"
-                         Foreground="{DynamicResource AppTextSecondaryBrush}"
-                         VerticalAlignment="Center" Margin="0,6,0,0"/>
-            </StackPanel>
-            <TextBlock x:Name="StatusLine" Classes="sub" Margin="0,10,0,0" TextWrapping="Wrap"/>
-          </StackPanel>
+      <!-- ═══ KPI 仪表行：数值 + 阈值胶囊 + 进度条 ═══ -->
+      <Grid ColumnDefinitions="*,12,*,12,*,12,*">
 
-          <!-- LIVE 胶囊：呼吸点 + 文字 -->
-          <Border x:Name="LivePill" Grid.Column="1" Classes="pill" VerticalAlignment="Top"
-                  Background="{DynamicResource LimeBgBrush}">
+        <Border Classes="tile">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="进程在线"/>
+              <Border Grid.Column="1" Classes="pill" Background="{DynamicResource LimeBgBrush}" Padding="7,2">
+                <TextBlock x:Name="KpiProcChip" Text="—" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{DynamicResource LimeBrush}"/>
+              </Border>
+            </Grid>
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <Ellipse x:Name="LiveDot" Classes="livedot" Width="6" Height="6"
-                       Fill="{DynamicResource LimeBrush}" VerticalAlignment="Center"/>
-              <TextBlock x:Name="LiveText" Text="LIVE" FontSize="11" FontWeight="Bold"
-                         Foreground="{DynamicResource LimeBrush}"/>
+              <TextBlock x:Name="KpiProcValue" Classes="metric" Text="—"/>
+              <TextBlock x:Name="KpiProcTotal" Text="/ —" FontSize="12"
+                         Foreground="{DynamicResource AppTextTertiaryBrush}" VerticalAlignment="Bottom"
+                         Margin="0,0,0,4"/>
+            </StackPanel>
+            <ProgressBar x:Name="KpiProcMeter" Classes="meter" Foreground="{DynamicResource LimeBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="tile" Grid.Column="2">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="CPU 使用率"/>
+              <Border Grid.Column="1" Classes="chip">
+                <TextBlock Text="阈值 80%" FontSize="10"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"/>
+              </Border>
+            </Grid>
+            <TextBlock x:Name="KpiCpuValue" Classes="metric" Text="—"/>
+            <ProgressBar x:Name="KpiCpuMeter" Classes="meter" Foreground="{DynamicResource IconPurpleBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="tile" Grid.Column="4">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="内存占用"/>
+              <Border Grid.Column="1" Classes="chip">
+                <TextBlock x:Name="KpiMemChip" Text="—" FontSize="10"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"/>
+              </Border>
+            </Grid>
+            <TextBlock x:Name="KpiMemValue" Classes="metric" Text="—"/>
+            <ProgressBar x:Name="KpiMemMeter" Classes="meter" Foreground="{DynamicResource IconBlueBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="tile" Grid.Column="6">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="磁盘占用"/>
+              <Border Grid.Column="1" Classes="chip">
+                <TextBlock x:Name="KpiDiskChip" Text="—" FontSize="10"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"/>
+              </Border>
+            </Grid>
+            <TextBlock x:Name="KpiDiskValue" Classes="metric" Text="—"/>
+            <ProgressBar x:Name="KpiDiskMeter" Classes="meter" Foreground="{DynamicResource IconGreenBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- ═══ 主区：进程表 + 右栏（运行环境 / 服务摘要） ═══ -->
+      <Grid ColumnDefinitions="*,12,296">
+
+        <Border Classes="card">
+          <StackPanel Spacing="8">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="进程" Classes="cardtitle" VerticalAlignment="Center"/>
+                <Border x:Name="ProcCountPill" Classes="pill" Background="{DynamicResource NeutralBgBrush}"
+                        Padding="7,2" VerticalAlignment="Center">
+                  <TextBlock x:Name="ProcCountText" Text="0" FontSize="10.5" FontWeight="Bold"
+                             FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                             Foreground="{DynamicResource NeutralFgBrush}"/>
+                </Border>
+                <Border x:Name="LivePill" Classes="pill" Background="{DynamicResource LimeBgBrush}"
+                        Padding="8,2" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Ellipse x:Name="LiveDot" Classes="livedot" Width="6" Height="6"
+                             Fill="{DynamicResource LimeBrush}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="LiveText" Text="LIVE" FontSize="10" FontWeight="Bold"
+                               Foreground="{DynamicResource LimeBrush}"/>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <Button x:Name="BtnStartAll" Content="启动全部" Classes="btn-sm"/>
+                <Button x:Name="BtnApplyRestart" Content="应用配置重启" Classes="btn-sm accent"/>
+              </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="StatusLine" Classes="sub" Text="" TextWrapping="Wrap"/>
+
+            <TextBlock x:Name="ProcBanner" Text="" TextWrapping="Wrap" FontSize="12" IsVisible="False"
+                       Foreground="{DynamicResource WarnFgBrush}" Margin="0,2,0,2"/>
+
+            <!-- 表头：列语义与行一致 -->
+            <Border Classes="tablehead">
+              <Grid ColumnDefinitions="*,90,80,80,Auto">
+                <TextBlock Text="进程" Classes="overline"/>
+                <TextBlock Grid.Column="1" Text="内存" Classes="overline"/>
+                <TextBlock Grid.Column="2" Text="CPU" Classes="overline"/>
+                <TextBlock Grid.Column="3" Text="重启" Classes="overline"/>
+                <TextBlock Grid.Column="4" Text="操作" Classes="overline" Width="150"
+                           TextAlignment="Right"/>
+              </Grid>
+            </Border>
+
+            <ItemsControl x:Name="ProcList" Margin="0,0,-12,0">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="row">
+                    <Grid ColumnDefinitions="*,90,80,80,Auto">
+                      <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Ellipse Width="6" Height="6" Fill="{Binding PillFg}" VerticalAlignment="Center"/>
+                        <Border Classes="iconbadge" Background="{Binding IconBg}">
+                          <TextBlock Text="{Binding IconGlyph}" FontSize="11" FontWeight="Bold"
+                                     Foreground="{Binding IconFg}"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="1">
+                          <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                                     Foreground="{DynamicResource AppTextPrimaryBrush}"/>
+                          <TextBlock Text="{Binding SubLine}" FontSize="10.5"
+                                     Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+                        </StackPanel>
+                      </StackPanel>
+
+                      <TextBlock Grid.Column="1" Text="{Binding MemText}" FontSize="11.5" FontWeight="Medium"
+                                 FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                                 Foreground="{DynamicResource AppTextSecondaryBrush}"
+                                 VerticalAlignment="Center"/>
+
+                      <TextBlock Grid.Column="2" Text="{Binding CpuText}" FontSize="11.5"
+                                 FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                                 Foreground="{DynamicResource AppTextTertiaryBrush}"
+                                 VerticalAlignment="Center"/>
+
+                      <TextBlock Grid.Column="3" Text="{Binding RestartsText}" FontSize="11.5"
+                                 FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                                 Foreground="{DynamicResource AppTextSecondaryBrush}"
+                                 VerticalAlignment="Center"/>
+
+                      <StackPanel Grid.Column="4" Classes="actions" Orientation="Horizontal" Spacing="4"
+                                  Width="150" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="重启" Classes="btn-sm" Tag="restart" Click="OnAction"/>
+                        <Button Content="停止" Classes="btn-sm" Tag="stop" Click="OnAction"/>
+                        <Button Content="删除" Classes="btn-sm" Tag="delete" Click="OnAction"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- 汇总栏 -->
+            <Border BorderBrush="{DynamicResource AppDividerBrush}" BorderThickness="0,1,0,0"
+                    Padding="12,7,12,2">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="ProcSummary" Text="" FontSize="11"
+                           Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+                <TextBlock Grid.Column="1" Text="自动刷新 5s" FontSize="10.5"
+                           FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                           Foreground="{DynamicResource AppTextDisabledBrush}"/>
+              </Grid>
+            </Border>
+
+            <TextBlock TextWrapping="Wrap" FontSize="11"
+                       Foreground="{DynamicResource AppTextDisabledBrush}"
+                       Text="悬停进程行出现操作按钮。「应用配置重启」执行 pm2 restart --update-env：改完 .env 必须走这个，普通 restart 保留旧环境变量，不会生效。"/>
+          </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Column="2" Spacing="12">
+          <Border Classes="card">
+            <StackPanel Spacing="9">
+              <TextBlock Classes="overline" Text="运行环境"/>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="主机"/>
+                <TextBlock x:Name="EnvHost" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" Text="—"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="平台"/>
+                <TextBlock x:Name="EnvPlatform" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" Text="—"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="已运行"/>
+                <TextBlock x:Name="EnvUptime" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" Text="—"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="磁盘"/>
+                <TextBlock x:Name="EnvDisk" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" Text="—"/>
+              </Grid>
             </StackPanel>
           </Border>
-        </Grid>
-      </Border>
 
-      <!-- ═══ 资源历史柱状图 ═══ -->
+          <Border Classes="card">
+            <StackPanel Spacing="9">
+              <TextBlock Classes="overline" Text="服务摘要"/>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="进程在线"/>
+                <TextBlock x:Name="SvcOnline" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource LimeBrush}" Text="—"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="重启合计"/>
+                <TextBlock x:Name="SvcRestarts" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" Text="—"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="采样窗口"/>
+                <TextBlock Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"
+                           Text="24 点 × 30s"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="k" Text="最近刷新"/>
+                <TextBlock x:Name="SvcUpdated" Grid.Column="1" Classes="mono" FontSize="11.5"
+                           Foreground="{DynamicResource AppTextTertiaryBrush}" Text="—"/>
+              </Grid>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+
+      <!-- ═══ 资源趋势：24 槽滚动窗口 ═══ -->
       <Border Classes="card">
-        <StackPanel Spacing="14">
+        <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Text="资源使用 · 近 12 分钟" Classes="cardtitle" VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-              <!-- 图例：色点 + 名称 + 实时数值 -->
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <Rectangle Width="8" Height="8" RadiusX="2" RadiusY="2" Fill="{DynamicResource IconPurpleBrush}" VerticalAlignment="Center"/>
                 <TextBlock Classes="sub" Text="CPU" VerticalAlignment="Center"/>
@@ -63,9 +269,8 @@
             </StackPanel>
           </Grid>
 
-          <!-- 图表区：柱体 + 底部基线 -->
           <Grid RowDefinitions="*,Auto">
-            <ItemsControl x:Name="BarChart" Height="96">
+            <ItemsControl x:Name="BarChart" Height="86">
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <UniformGrid Rows="1" Columns="24"/>
@@ -74,7 +279,7 @@
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
                   <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Bottom"
-                              HorizontalAlignment="Left" Height="88"
+                              HorizontalAlignment="Left" Height="86"
                               IsVisible="{Binding HasBars}"
                               ToolTip.Tip="{Binding Label}">
                     <Rectangle Width="10" Height="{Binding CpuH}" Fill="{DynamicResource IconPurpleBrush}"
@@ -87,7 +292,6 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <!-- 基线 -->
             <Border Grid.Row="1" Height="1" Background="{DynamicResource AppDividerBrush}" Margin="0,4,0,0"/>
           </Grid>
 
@@ -97,83 +301,6 @@
             <TextBlock Grid.Column="2" Classes="sub" Text="现在" HorizontalAlignment="Right"
                        Foreground="{DynamicResource LimeBrush}"/>
           </Grid>
-        </StackPanel>
-      </Border>
-
-      <!-- ═══ 进程列表 ═══ -->
-      <Border Classes="card">
-        <StackPanel Spacing="6">
-          <Grid ColumnDefinitions="*,Auto" Margin="-6,0,0,6">
-            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-              <TextBlock Text="进程" Classes="cardtitle" VerticalAlignment="Center"/>
-              <Border x:Name="ProcCountPill" Classes="pill" Background="{DynamicResource NeutralBgBrush}"
-                      Padding="8,2" VerticalAlignment="Center">
-                <TextBlock x:Name="ProcCountText" Text="0" FontSize="10.5" FontWeight="Bold"
-                           FontFamily="Consolas, DejaVu Sans Mono, monospace"
-                           Foreground="{DynamicResource NeutralFgBrush}"/>
-              </Border>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-              <Button x:Name="BtnStartAll" Content="启动全部" Classes="btn-sm"/>
-              <Button x:Name="BtnApplyRestart" Content="应用配置重启" Classes="btn-sm"/>
-            </StackPanel>
-          </Grid>
-
-          <TextBlock x:Name="ProcBanner" Text="" TextWrapping="Wrap" FontSize="12" IsVisible="False"
-                     Foreground="{DynamicResource WarnFgBrush}" Margin="0,4,0,4"/>
-
-          <ItemsControl x:Name="ProcList" Margin="0,0,-12,0">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Classes="row">
-                  <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                    <StackPanel Orientation="Horizontal" Spacing="13">
-                      <Border Classes="iconbadge" Background="{Binding IconBg}">
-                        <TextBlock Text="{Binding IconGlyph}" FontSize="15" FontWeight="SemiBold"
-                                   Foreground="{Binding IconFg}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                      </Border>
-                      <StackPanel VerticalAlignment="Center" Spacing="2">
-                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource AppTextPrimaryBrush}"/>
-                        <TextBlock Text="{Binding SubLine}" FontSize="11"
-                                   Foreground="{DynamicResource AppTextTertiaryBrush}"/>
-                      </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right"
-                                VerticalAlignment="Center" Margin="0,0,18,0">
-                      <TextBlock Text="{Binding MemText}" FontSize="13.5" FontWeight="Bold"
-                                 Foreground="{DynamicResource LimeBrush}"
-                                 FontFamily="Consolas, DejaVu Sans Mono, monospace"
-                                 HorizontalAlignment="Right"/>
-                      <TextBlock Text="{Binding CpuText}" FontSize="10"
-                                 Foreground="{DynamicResource AppTextTertiaryBrush}"
-                                 FontFamily="Consolas, DejaVu Sans Mono, monospace"
-                                 HorizontalAlignment="Right" Margin="0,1,0,0"/>
-                    </StackPanel>
-
-                    <Border Grid.Column="2" Classes="pill" Background="{Binding PillBg}" Padding="9,3"
-                            VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Status}" FontSize="10.5" FontWeight="SemiBold"
-                                 Foreground="{Binding PillFg}"/>
-                    </Border>
-
-                    <StackPanel Grid.Column="3" Classes="actions" Orientation="Horizontal" Spacing="6"
-                                VerticalAlignment="Center" Margin="14,0,2,0">
-                      <Button Content="重启" Classes="btn-sm" Tag="restart" Click="OnAction"/>
-                      <Button Content="停止" Classes="btn-sm" Tag="stop" Click="OnAction"/>
-                      <Button Content="删除" Classes="btn-sm" Tag="delete" Click="OnAction"/>
-                    </StackPanel>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
-          <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,8,0,0"
-                     Foreground="{DynamicResource AppTextDisabledBrush}"
-                     Text="悬停进程行出现操作按钮。「应用配置重启」执行 pm2 restart --update-env：改完 .env 必须走这个，普通 restart 保留旧环境变量，不会生效。"/>
         </StackPanel>
       </Border>
     </StackPanel>

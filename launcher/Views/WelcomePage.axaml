@@ -1,0 +1,162 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ClassIntraOps.Launcher.Views.WelcomePage">
+
+  <ScrollViewer>
+    <StackPanel Spacing="12">
+
+      <!-- ═══ Hero：唯一的主行动 = 让 CI 仓库就位 ═══ -->
+      <Border Classes="card" Padding="18">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="10">
+            <TextBlock Classes="overline" Text="CLASSINTRAOPS · 首次使用"/>
+            <TextBlock Text="三步开始：定位仓库 → 配置密钥 → 启动服务" FontSize="17" FontWeight="Bold"
+                       Foreground="{DynamicResource AppTextPrimaryBrush}" TextWrapping="Wrap"/>
+            <TextBlock FontSize="11.5" TextWrapping="Wrap" MaxWidth="620"
+                       Foreground="{DynamicResource AppTextSecondaryBrush}"
+                       Text="控制台的所有操作都作用在 CI 仓库上：密钥读写 server/.env、日志取自 logs/、服务由 PM2 托管。仓库没就位，配置类页面会先把你拦在这里——这是刻意的，免得对着空数据猜。"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+              <Button x:Name="BtnInstall" Content="下载并安装 CI" Classes="accent" Padding="18,7"/>
+              <Button x:Name="BtnPickFolder" Content="选择已有 CI 目录" Padding="14,6"/>
+              <Button x:Name="BtnSettings" Content="手动指定路径" Classes="ghost"/>
+            </StackPanel>
+          </StackPanel>
+
+          <Border Grid.Column="1" Classes="pill" Padding="10,6" VerticalAlignment="Top"
+                  Background="{DynamicResource AppCardBrush}"
+                  BorderBrush="{DynamicResource AppCardBorderBrush}" BorderThickness="1">
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <Ellipse x:Name="HeroDot" Width="6" Height="6" Fill="Gray" VerticalAlignment="Center"/>
+              <TextBlock x:Name="HeroStatusText" Text="检测中…" FontSize="11"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Border>
+
+      <!-- 门禁说明：从被拦下的页面跳回来时出现 -->
+      <Border x:Name="GateBanner" Classes="card" Padding="12,9" IsVisible="False"
+              Background="{DynamicResource WarnBgBrush}" BorderBrush="{DynamicResource WarnFgBrush}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <PathIcon Width="13" Height="13" VerticalAlignment="Center"
+                    Foreground="{DynamicResource WarnFgBrush}"
+                    Data="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 6.8a1 1 0 0 1 1 1v4.4a1 1 0 0 1-2 0V7.8a1 1 0 0 1 1-1zm0-3.3a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/>
+          <TextBlock x:Name="GateBannerText" TextWrapping="Wrap" FontSize="11.5"
+                     Foreground="{DynamicResource WarnFgBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ═══ 三步引导 ═══ -->
+      <Grid ColumnDefinitions="*,12,*,12,*">
+
+        <Border Classes="tile">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="步骤 01"/>
+              <Border x:Name="Step1Pill" Grid.Column="1" Classes="pill" Padding="7,2"
+                      Background="{DynamicResource WarnBgBrush}">
+                <TextBlock x:Name="Step1Chip" Text="进行中" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{DynamicResource WarnFgBrush}"/>
+              </Border>
+            </Grid>
+            <TextBlock Text="定位 CI 仓库" FontSize="13.5" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppTextPrimaryBrush}"/>
+            <TextBlock TextWrapping="Wrap" FontSize="11" Height="48" VerticalAlignment="Top"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Text="下载安装（git clone → 装依赖 → 构建）或直接指向已有仓库目录。判定依据：目录下有 ecosystem.config.js 或 server/。"/>
+            <TextBlock x:Name="Step1Detail" FontSize="10.5" TextWrapping="Wrap"
+                       FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}" Text="—"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="tile" Grid.Column="2">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="步骤 02"/>
+              <Border x:Name="Step2Pill" Grid.Column="1" Classes="pill" Padding="7,2"
+                      Background="{DynamicResource NeutralBgBrush}">
+                <TextBlock x:Name="Step2Chip" Text="待办" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{DynamicResource NeutralFgBrush}"/>
+              </Border>
+            </Grid>
+            <TextBlock Text="配置密钥" FontSize="13.5" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppTextPrimaryBrush}"/>
+            <TextBlock TextWrapping="Wrap" FontSize="11" Height="48" VerticalAlignment="Top"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Text="由 server/.env.example 推导分组表单：密钥打码不回显、留空不覆盖、保存自动备份。至少确认 JWT_SECRET 与 PORT 可用。"/>
+            <TextBlock x:Name="Step2Detail" FontSize="10.5"
+                       FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}" Text="—"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="tile" Grid.Column="4">
+          <StackPanel Spacing="9">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="overline" Text="步骤 03"/>
+              <Border x:Name="Step3Pill" Grid.Column="1" Classes="pill" Padding="7,2"
+                      Background="{DynamicResource NeutralBgBrush}">
+                <TextBlock x:Name="Step3Chip" Text="待办" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{DynamicResource NeutralFgBrush}"/>
+              </Border>
+            </Grid>
+            <TextBlock Text="启动服务" FontSize="13.5" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AppTextPrimaryBrush}"/>
+            <TextBlock TextWrapping="Wrap" FontSize="11" Height="48" VerticalAlignment="Top"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"
+                       Text="pm2 start ecosystem.config.js 并 pm2 save 固化。之后改过 .env 必须走「应用配置重启」，普通 restart 不会重新加载环境变量。"/>
+            <TextBlock x:Name="Step3Detail" FontSize="10.5"
+                       FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}" Text="—"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- ═══ 工具检测 + 定位状态 ═══ -->
+      <Grid ColumnDefinitions="*,12,296">
+
+        <Border Classes="card">
+          <StackPanel Spacing="8">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="环境依赖" Classes="cardtitle" VerticalAlignment="Center"/>
+              <Button x:Name="BtnReDetect" Content="重新检测" Grid.Column="1" Classes="btn-sm"/>
+            </Grid>
+            <Border Classes="tablehead">
+              <Grid ColumnDefinitions="Auto,0.5*,*">
+                <TextBlock Text="工具" Classes="overline"/>
+                <TextBlock Grid.Column="1" Text="状态" Classes="overline"/>
+                <TextBlock Grid.Column="2" Text="版本" Classes="overline"/>
+              </Grid>
+            </Border>
+            <StackPanel x:Name="ToolsHost" Spacing="0"/>
+            <TextBlock TextWrapping="Wrap" FontSize="11"
+                       Foreground="{DynamicResource AppTextDisabledBrush}"
+                       Text="node / pnpm / git / pm2 缺一不可：node 跑服务本体，pnpm 装依赖与构建，git 拉源码，pm2 托管进程。缺 pm2 时可在安装步骤前单独安装。"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="9">
+            <TextBlock Classes="overline" Text="当前定位"/>
+            <TextBlock x:Name="RootPathText" Text="—" FontSize="11"
+                       FontFamily="Consolas, DejaVu Sans Mono, monospace" TextWrapping="Wrap"
+                       Foreground="{DynamicResource AppTextSecondaryBrush}"/>
+            <TextBlock x:Name="RootCheckText" Text="" FontSize="11" TextWrapping="Wrap"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+            <Border BorderBrush="{DynamicResource AppDividerBrush}" BorderThickness="0,1,0,0"
+                    Padding="0,9,0,0">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="k" Text="仓库来源"/>
+                <TextBlock x:Name="RepoText" Text="—" FontSize="11"
+                           FontFamily="Consolas, DejaVu Sans Mono, monospace" TextWrapping="Wrap"
+                           Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -4,6 +4,9 @@
         Title="ClassIntraOps · CI 运维控制台"
         Width="1180" Height="760"
         WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="8"
+        WindowDecorations="None"
         Background="{DynamicResource AppBackgroundBrush}"
         FontFamily="Microsoft YaHei UI, Segoe UI, Noto Sans CJK SC, sans-serif">
 
@@ -20,20 +23,32 @@
           </Border>
         </ControlTemplate>
       </Setter>
+      <!-- 导航底色过渡改在代码后置声明（Window XAML 的 Transitions 触发编译器 bug） -->
       <Style Selector="^:pointerover">
         <Style Selector="^ /template/ Border#Bd">
-          <Setter Property="Background" Value="#141822"/>
+          <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
         </Style>
         <Style Selector="^ /template/ ContentPresenter#IconHost">
-          <Setter Property="TextElement.Foreground" Value="#C4C9D4"/>
+          <Setter Property="TextElement.Foreground" Value="{DynamicResource AppTextSecondaryBrush}"/>
         </Style>
       </Style>
       <Style Selector="^:selected">
         <Style Selector="^ /template/ Border#Bd">
-          <Setter Property="Background" Value="#1D2331"/>
+          <Setter Property="Background" Value="{DynamicResource NavActiveBrush}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource AccentSoftBorderBrush}"/>
+          <Setter Property="BorderThickness" Value="1"/>
         </Style>
         <Style Selector="^ /template/ ContentPresenter#IconHost">
-          <Setter Property="TextElement.Foreground" Value="#E5E7EB"/>
+          <Setter Property="TextElement.Foreground" Value="{DynamicResource NavActiveFgBrush}"/>
+        </Style>
+      </Style>
+      <!-- 门禁：依赖 CI 的页面在未定位仓库时禁用（图标压暗，不参与悬停） -->
+      <Style Selector="^:disabled">
+        <Style Selector="^ /template/ Border#Bd">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="^ /template/ ContentPresenter#IconHost">
+          <Setter Property="TextElement.Foreground" Value="#39404E"/>
         </Style>
       </Style>
     </ControlTheme>
@@ -45,7 +60,120 @@
       <Setter Property="BorderThickness" Value="0"/>
       <Setter Property="Padding" Value="0"/>
     </Style>
+
+    <!-- 液体流动：光斑漂移（26s / 32s / 12s 三种节奏，互相错拍） -->
+    <Style Selector="Ellipse.aurora">
+      <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+    <Style Selector="Ellipse.aur1">
+      <Style.Animations>
+        <Animation Duration="0:0:26" IterationCount="Infinite" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%"><Setter Property="TranslateTransform.X" Value="-70"/><Setter Property="TranslateTransform.Y" Value="0"/></KeyFrame>
+          <KeyFrame Cue="50%"><Setter Property="TranslateTransform.X" Value="110"/><Setter Property="TranslateTransform.Y" Value="46"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="TranslateTransform.X" Value="-70"/><Setter Property="TranslateTransform.Y" Value="0"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.aur2">
+      <Style.Animations>
+        <Animation Duration="0:0:32" IterationCount="Infinite" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%"><Setter Property="TranslateTransform.X" Value="60"/><Setter Property="TranslateTransform.Y" Value="-30"/></KeyFrame>
+          <KeyFrame Cue="50%"><Setter Property="TranslateTransform.X" Value="-90"/><Setter Property="TranslateTransform.Y" Value="-90"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="TranslateTransform.X" Value="60"/><Setter Property="TranslateTransform.Y" Value="-30"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.aur3">
+      <Style.Animations>
+        <Animation Duration="0:0:12" IterationCount="Infinite" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.45"/><Setter Property="TranslateTransform.X" Value="-30"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/><Setter Property="TranslateTransform.X" Value="40"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- 自绘标题栏按钮：无边框窗口的窗口控制 -->
+    <Style Selector="Border.capbtn">
+      <Setter Property="Width" Value="44"/>
+      <Setter Property="Height" Value="30"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Border.capbtn:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
+    </Style>
+    <Style Selector="Border.capbtn:pointerover Path">
+      <Setter Property="Stroke" Value="{DynamicResource AppTextPrimaryBrush}"/>
+    </Style>
+    <Style Selector="Border.capbtn.close:pointerover">
+      <Setter Property="Background" Value="#C42B1C"/>
+    </Style>
+    <Style Selector="Border.capbtn.close:pointerover Path">
+      <Setter Property="Stroke" Value="#FFFFFF"/>
+    </Style>
+
+    <!-- 命令栏可拖拽区：光标用默认箭头（Avalonia Cursor.Parse 不接受 "Default" 字面量） -->
+    <Style Selector="Border.caption">
+      <Setter Property="Cursor" Value="Arrow"/>
+    </Style>
+
+    <!-- 缩放握把 -->
+    <Style Selector="Border.resizegrip">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Border.resizegrip:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
+    </Style>
+    <Style Selector="Border.resizegrip:pointerover Path">
+      <Setter Property="Stroke" Value="{DynamicResource AppTextPrimaryBrush}"/>
+      <Setter Property="Opacity" Value="1"/>
+    </Style>
   </Window.Styles>
+
+  <Grid>
+    <!-- 液体流动背景：三个低饱和光斑缓慢漂移（最底层，不参与命中测试） -->
+    <Panel IsHitTestVisible="False" ClipToBounds="True">
+    <Ellipse Classes="aurora aur1" Width="880" Height="880"
+             HorizontalAlignment="Right" VerticalAlignment="Top" Margin="-160,-300,0,0"
+             Opacity="0.9">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#296366F1" Offset="0"/>
+          <GradientStop Color="#006366F1" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+      <Ellipse.RenderTransform>
+        <TranslateTransform/>
+      </Ellipse.RenderTransform>
+    </Ellipse>
+    <Ellipse Classes="aurora aur2" Width="820" Height="820"
+             HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-220,-160,0,-320">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#1AA855F7" Offset="0"/>
+          <GradientStop Color="#00A855F7" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+      <Ellipse.RenderTransform>
+        <TranslateTransform/>
+      </Ellipse.RenderTransform>
+    </Ellipse>
+    <Ellipse Classes="aurora aur3" Width="640" Height="640"
+             HorizontalAlignment="Center" VerticalAlignment="Center" Margin="220,-80,0,-120">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#0D34D399" Offset="0"/>
+          <GradientStop Color="#0034D399" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+      <Ellipse.RenderTransform>
+        <TranslateTransform/>
+      </Ellipse.RenderTransform>
+    </Ellipse>
+  </Panel>
 
   <Grid ColumnDefinitions="64,*">
 
@@ -66,28 +194,31 @@
         <ListBox x:Name="NavList" Grid.Row="1" SelectionMode="Single" Margin="0"
                  ItemContainerTheme="{StaticResource NavItemTheme}"
                  HorizontalAlignment="Stretch">
-          <ListBoxItem Tag="overview" IsSelected="True" ToolTip.Tip="总览" HorizontalContentAlignment="Center">
+          <ListBoxItem x:Name="NavWelcome" Tag="welcome" ToolTip.Tip="欢迎 · 开始使用" HorizontalContentAlignment="Center">
+            <PathIcon Width="17" Height="17" Data="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/>
+          </ListBoxItem>
+          <ListBoxItem x:Name="NavOverview" Tag="overview" ToolTip.Tip="总览" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
           </ListBoxItem>
-          <ListBoxItem Tag="secrets" ToolTip.Tip="密钥配置" HorizontalContentAlignment="Center">
+          <ListBoxItem x:Name="NavSecrets" Tag="secrets" ToolTip.Tip="密钥配置" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M12 2a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z"/>
           </ListBoxItem>
-          <ListBoxItem Tag="peers" ToolTip.Tip="跨班对端" HorizontalContentAlignment="Center">
+          <ListBoxItem x:Name="NavPeers" Tag="peers" ToolTip.Tip="跨班对端" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M7 7h10l-3-3 1.5-1.5L21 8l-5.5 5.5L14 12l3-3H7zM17 17H7l3 3-1.5 1.5L3 16l5.5-5.5L10 12l-3 3h10z"/>
           </ListBoxItem>
-          <ListBoxItem Tag="install" ToolTip.Tip="安装更新" HorizontalContentAlignment="Center">
+          <ListBoxItem x:Name="NavInstall" Tag="install" ToolTip.Tip="安装更新" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M11 3h2v10l4-4 1.4 1.4L12 16.8 5.6 10.4 7 9l4 4zM4 19h16v2H4z"/>
           </ListBoxItem>
-          <ListBoxItem Tag="logs" ToolTip.Tip="服务日志" HorizontalContentAlignment="Center">
+          <ListBoxItem x:Name="NavLogs" Tag="logs" ToolTip.Tip="服务日志" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M6 2h9l5 5v15H6zM14 3.5V8h4.5zM8 12h8v2H8zm0 4h8v2H8z"/>
           </ListBoxItem>
-          <ListBoxItem Tag="settings" ToolTip.Tip="环境设置" HorizontalContentAlignment="Center">
+          <ListBoxItem x:Name="NavSettings" Tag="settings" ToolTip.Tip="环境设置" HorizontalContentAlignment="Center">
             <PathIcon Width="17" Height="17" Data="M4 7h16v2H4zm0 8h16v2H4zm4-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm8-4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
           </ListBoxItem>
         </ListBox>
 
         <!-- 底部版本 -->
-        <TextBlock Grid.Row="2" Text="v1.0" FontSize="10" TextAlignment="Center"
+        <TextBlock Grid.Row="2" Text="v0.1" FontSize="10" TextAlignment="Center"
                    Foreground="{DynamicResource AppTextDisabledBrush}"/>
       </Grid>
     </Border>
@@ -95,43 +226,97 @@
     <!-- ================= 内容区 ================= -->
     <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
 
-      <!-- 顶栏：页标题 + 全局状态胶囊 -->
-      <Border Padding="26,16,26,13"
-              BorderBrush="{DynamicResource AppDividerBrush}"
-              BorderThickness="0,0,0,1">
-        <Grid ColumnDefinitions="*,Auto">
-          <TextBlock x:Name="PageTitle" Classes="h1" Text="总览" VerticalAlignment="Center"/>
-          <Border Grid.Column="1" Classes="pill"
-                  Background="{DynamicResource AppCardBrush}"
-                  BorderBrush="{DynamicResource AppCardBorderBrush}"
-                  BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <StackPanel Orientation="Horizontal" Spacing="7">
-              <Ellipse x:Name="CiStatusDot" Width="7" Height="7" Fill="Gray" VerticalAlignment="Center"/>
-              <TextBlock x:Name="CiStatusText" Text="定位 CI 仓库…" FontSize="11.5"
-                         Foreground="{DynamicResource AppTextSecondaryBrush}" VerticalAlignment="Center"/>
+      <!-- 命令栏（兼自绘标题栏）：空白处拖动窗口、双击最大化；右上自绘窗口控制 -->
+      <Border BorderBrush="{DynamicResource AppDividerBrush}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+          <!-- 拖拽层：垫底透明层，空白处按下即拖动；交互控件在其上不受影响 -->
+          <Border Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent"
+                  PointerPressed="OnCaptionPressed" DoubleTapped="OnCaptionDoubleTapped"/>
+
+          <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"
+                      Margin="20,14,0,12" IsHitTestVisible="False">
+            <TextBlock x:Name="PageTitle" Classes="h1" Text="总览" VerticalAlignment="Center"/>
+            <TextBlock x:Name="PageSub" Text="实时监控 · 1 秒刷新" FontSize="11"
+                       Foreground="{DynamicResource AppTextTertiaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"
+                      Margin="0,14,12,12">
+            <!-- 搜索井：Ctrl K 键位提示（本机快捷键约定） -->
+            <Border Background="{DynamicResource AppWellBrush}"
+                    BorderBrush="{DynamicResource AppCardBorderBrush}"
+                    BorderThickness="1" CornerRadius="8" Height="30" Width="250" Padding="10,0,8,0">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <PathIcon Width="13" Height="13" VerticalAlignment="Center"
+                          Foreground="{DynamicResource AppTextTertiaryBrush}"
+                          Data="M7 1a6 6 0 1 0 3.5 10.9l4.3 4.3 1.4-1.4-4.3-4.3A6 6 0 0 0 7 1zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
+                <TextBlock Grid.Column="1" Text="搜索进程 / 配置 / 日志" FontSize="11.5" Margin="8,0,0,0"
+                           Foreground="{DynamicResource AppTextDisabledBrush}" VerticalAlignment="Center"/>
+                <Border Grid.Column="2" Classes="chip" Padding="5,2" VerticalAlignment="Center"
+                        Background="{DynamicResource AppRaisedBrush}">
+                  <TextBlock Text="Ctrl K" FontSize="9.5" FontWeight="Medium"
+                             FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                             Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+                </Border>
+              </Grid>
+            </Border>
+
+            <Border Classes="pill" Padding="10,6"
+                    Background="{DynamicResource AppCardBrush}"
+                    BorderBrush="{DynamicResource AppCardBorderBrush}"
+                    BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="7">
+                <Ellipse x:Name="CiStatusDot" Classes="livedot" Width="6" Height="6" Fill="Gray" VerticalAlignment="Center"/>
+                <TextBlock x:Name="CiStatusText" Text="定位 CI 仓库…" FontSize="11"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Border>
+
+            <!-- 自绘窗口控制：最小化 / 最大化 / 关闭 -->
+            <StackPanel Orientation="Horizontal" Spacing="2" Margin="10,0,0,0">
+              <Border Classes="capbtn" Tapped="OnMinimize" ToolTip.Tip="最小化">
+                <Path Stroke="{DynamicResource AppTextSecondaryBrush}" StrokeThickness="1" Data="M1,5 H9"/>
+              </Border>
+              <Border Classes="capbtn" Tapped="OnMaximizeToggle" ToolTip.Tip="最大化 / 还原">
+                <Path Stroke="{DynamicResource AppTextSecondaryBrush}" StrokeThickness="1" Data="M1.5,1.5 H8.5 V8.5 H1.5 Z"/>
+              </Border>
+              <Border Classes="capbtn close" Tapped="OnClose" ToolTip.Tip="关闭">
+                <Path Stroke="{DynamicResource AppTextSecondaryBrush}" StrokeThickness="1" Data="M1,1 L9,9 M9,1 L1,9"/>
+              </Border>
             </StackPanel>
-          </Border>
+          </StackPanel>
         </Grid>
       </Border>
 
-      <!-- 页面 -->
-      <ContentControl x:Name="PageHost" Grid.Row="1" Margin="26,18,26,4"/>
+      <!-- 页面（切换时 180ms 淡入，过渡声明见 Window.Styles 的 #PageHost） -->
+      <ContentControl x:Name="PageHost" Grid.Row="1" Margin="20,16,20,12"/>
 
       <!-- 状态栏 -->
-      <Border Grid.Row="2" Padding="26,7"
+      <Border Grid.Row="2" Padding="20,7"
               BorderBrush="{DynamicResource AppDividerBrush}"
               BorderThickness="0,1,0,0">
         <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Orientation="Horizontal" Spacing="20">
+          <StackPanel Orientation="Horizontal" Spacing="16">
             <TextBlock x:Name="StatusCi" Text="" FontSize="10.5"
+                       FontFamily="Consolas, DejaVu Sans Mono, monospace"
                        Foreground="{DynamicResource AppTextDisabledBrush}"/>
             <TextBlock x:Name="StatusNet" Text="" FontSize="10.5"
+                       FontFamily="Consolas, DejaVu Sans Mono, monospace"
                        Foreground="{DynamicResource AppTextDisabledBrush}"/>
           </StackPanel>
           <TextBlock x:Name="StatusRefresh" Text="" FontSize="10.5" Grid.Column="1"
+                     FontFamily="Consolas, DejaVu Sans Mono, monospace"
                      Foreground="{DynamicResource AppTextDisabledBrush}"/>
         </Grid>
       </Border>
     </Grid>
+  </Grid>
+
+  <!-- 缩放握把：WindowDecorations=None 后系统边缘缩放不可用，这里提供保证可用的缩放入口 -->
+  <Border x:Name="ResizeGrip" Classes="resizegrip" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+          Width="20" Height="20" PointerPressed="OnResizeGripPressed" ToolTip.Tip="拖拽调整窗口大小">
+    <Path Stroke="{DynamicResource AppTextTertiaryBrush}" StrokeThickness="1" Opacity="0.6"
+          Data="M0,10 L10,0 M0,15 L15,0 M5,15 L15,5"/>
+  </Border>
   </Grid>
 </Window>

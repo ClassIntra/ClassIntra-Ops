@@ -2,38 +2,103 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ClassIntraOps.Launcher.Views.PeersPage">
   <ScrollViewer>
-    <StackPanel Spacing="14">
+    <StackPanel Spacing="12">
 
-      <Border Classes="card">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Spacing="8">
-            <TextBlock x:Name="SummaryText" Text="读取中…" FontWeight="SemiBold" FontSize="13.5"/>
-            <TextBlock x:Name="DetailText" Text="" FontSize="11.5" Opacity="0.65" TextWrapping="Wrap"/>
-          </StackPanel>
-          <Button x:Name="BtnRefresh" Content="重新探活" Grid.Column="1" VerticalAlignment="Center" Padding="14,6"/>
-        </Grid>
-      </Border>
-
+      <!-- ═══ 对端表 ═══ -->
       <Border Classes="card">
         <StackPanel Spacing="8">
-          <TextBlock Text="已配置对端（RELAY_SERVERS）" FontWeight="SemiBold" FontSize="13.5"/>
-          <StackPanel x:Name="PeerHost" Spacing="2"/>
-          <TextBlock TextWrapping="Wrap" FontSize="11.5" Opacity="0.65"
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+              <TextBlock Text="对端" Classes="cardtitle" VerticalAlignment="Center"/>
+              <TextBlock x:Name="SummaryText" Text="读取中…" FontSize="11"
+                         Foreground="{DynamicResource AppTextTertiaryBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+              <Button x:Name="BtnRefresh" Content="立即探活" Classes="btn-sm accent"/>
+            </StackPanel>
+          </Grid>
+
+          <TextBlock x:Name="DetailText" Text="" FontSize="11" TextWrapping="Wrap"
+                     Foreground="{DynamicResource AppTextTertiaryBrush}"/>
+
+          <Border Classes="tablehead">
+            <Grid ColumnDefinitions="*,200,130,90,Auto">
+              <TextBlock Text="对端" Classes="overline"/>
+              <TextBlock Grid.Column="1" Text="地址" Classes="overline"/>
+              <TextBlock Grid.Column="2" Text="TCP 延迟" Classes="overline"/>
+              <TextBlock Grid.Column="3" Text="状态" Classes="overline"/>
+              <TextBlock Grid.Column="4" Text="操作" Classes="overline" Width="56" TextAlignment="Right"/>
+            </Grid>
+          </Border>
+
+          <StackPanel x:Name="PeerHost" Spacing="0"/>
+
+          <TextBlock TextWrapping="Wrap" FontSize="11"
+                     Foreground="{DynamicResource AppTextDisabledBrush}"
                      Text="在线判定基于 TCP 握手：CI 的 relay 只在 /relay 路径响应（426），根路径会把 HTTP 探测挂到超时造成误判，所以这里不看 HTTP 状态码。"/>
         </StackPanel>
       </Border>
 
-      <Border Classes="card">
-        <StackPanel Spacing="10">
-          <TextBlock Text="临时探活" FontWeight="SemiBold" FontSize="13.5"/>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBox x:Name="ProbeInput" PlaceholderText="100.115.93.90:10011 或 ws://host:port/relay"/>
-            <Button x:Name="BtnProbe" Content="探测" Grid.Column="1" Margin="8,0,0,0" Padding="14,6"/>
-          </Grid>
-          <TextBox x:Name="ProbeOut" IsReadOnly="True" Height="130" FontFamily="Consolas, DejaVu Sans Mono, monospace" FontSize="12"
-                   TextWrapping="Wrap" AcceptsReturn="True"/>
-        </StackPanel>
-      </Border>
+      <!-- ═══ 探活控制台 + 传输判据 ═══ -->
+      <Grid ColumnDefinitions="*,12,296">
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="探活控制台" Classes="overline" VerticalAlignment="Center"/>
+              <Border Grid.Column="1" Classes="chip">
+                <TextBlock Text="TCP" FontSize="9.5" FontWeight="Medium"
+                           FontFamily="Consolas, DejaVu Sans Mono, monospace"
+                           Foreground="{DynamicResource AppTextSecondaryBrush}"/>
+              </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBox x:Name="ProbeInput"
+                       PlaceholderText="100.115.93.90:10011 或 ws://host:port/relay"
+                       FontSize="12" Height="32" CornerRadius="8"
+                       Background="{DynamicResource AppWellBrush}"
+                       BorderBrush="{DynamicResource AppCardBorderBrush}"
+                       VerticalContentAlignment="Center"/>
+              <Button x:Name="BtnProbe" Content="探测" Grid.Column="1" Margin="8,0,0,0"
+                      Classes="btn-sm accent" Height="32"/>
+            </Grid>
+
+            <TextBox x:Name="ProbeOut" IsReadOnly="True" MinHeight="150" Classes="terminal"
+                     TextWrapping="Wrap" AcceptsReturn="True"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="9">
+            <TextBlock Classes="overline" Text="传输判据"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="k" Text="传输"/>
+              <TextBlock Grid.Column="1" Classes="mono" FontSize="11.5"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}" Text="TCP 握手"/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="k" Text="响应路径"/>
+              <TextBlock Grid.Column="1" Classes="mono" FontSize="11.5"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}" Text="/relay"/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="k" Text="超时"/>
+              <TextBlock Grid.Column="1" Classes="mono" FontSize="11.5"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}" Text="3000 ms"/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="k" Text="探测间隔"/>
+              <TextBlock Grid.Column="1" Classes="mono" FontSize="11.5"
+                         Foreground="{DynamicResource AppTextSecondaryBrush}" Text="30 s"/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="k" Text="误判规避"/>
+              <TextBlock Grid.Column="1" Classes="mono" FontSize="11.5"
+                         Foreground="{DynamicResource LimeBrush}" Text="不走应用路由"/>
+            </Grid>
+          </StackPanel>
+        </Border>
+      </Grid>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

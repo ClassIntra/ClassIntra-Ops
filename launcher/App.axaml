@@ -14,21 +14,35 @@
             <Color x:Key="SystemAccentColorLight2">#9B9CF7</Color>
             <Color x:Key="SystemAccentColorLight3">#BFBFFA</Color>
 
-            <!-- 背景层次（窗口最深 → 侧栏 → 卡片 → 浮层） -->
-            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0A0B0F"/>
-            <SolidColorBrush x:Key="AppSidebarBrush" Color="#0D0F14"/>
-            <SolidColorBrush x:Key="AppCardBrush" Color="#14171E"/>
-            <SolidColorBrush x:Key="AppCardBorderBrush" Color="#20242E"/>
-            <SolidColorBrush x:Key="AppDividerBrush" Color="#1B1F27"/>
-            <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#F3F4F6"/>
-            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#9CA3AF"/>
-            <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="#6B7280"/>
-            <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#4B5563"/>
+            <!-- 背景层次（窗口最深 → 侧栏 → 卡片 → 浮层）
+                 精修：画布与卡片整体压深，拉开与文字/描边的对比 -->
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#08090C"/>
+            <SolidColorBrush x:Key="AppSidebarBrush" Color="#0B0D11"/>
+            <SolidColorBrush x:Key="AppCardBrush" Color="#101319"/>
+            <SolidColorBrush x:Key="AppCardBorderBrush" Color="#1E2330"/>
+            <SolidColorBrush x:Key="AppDividerBrush" Color="#171B23"/>
+            <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#EDEFF3"/>
+            <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#9AA3B2"/>
+            <SolidColorBrush x:Key="AppTextTertiaryBrush" Color="#6B7484"/>
+            <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#4A5261"/>
+
+            <!-- 井面 / 抬升面 / 悬停面 / 仪表槽 -->
+            <SolidColorBrush x:Key="AppWellBrush" Color="#0A0C10"/>
+            <SolidColorBrush x:Key="AppRaisedBrush" Color="#161A21"/>
+            <SolidColorBrush x:Key="AppHoverBrush" Color="#161A21"/>
+            <SolidColorBrush x:Key="MeterTrackBrush" Color="#1A1F2A"/>
+
+            <!-- accent 柔和态：导航选中、次级强调、焦点 -->
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#1E2140"/>
+            <SolidColorBrush x:Key="AccentSoftBorderBrush" Color="#3A3F7A"/>
+            <SolidColorBrush x:Key="AccentSoftFgBrush" Color="#A5ACFF"/>
+            <SolidColorBrush x:Key="NavActiveBrush" Color="#1E2140"/>
+            <SolidColorBrush x:Key="NavActiveFgBrush" Color="#A5ACFF"/>
 
             <!-- 卡片微渐变（顶部略亮，模拟顶光） -->
             <LinearGradientBrush x:Key="CardSurfaceBrush" StartPoint="0%,0%" EndPoint="0%,100%">
-                <GradientStop Color="#171A22" Offset="0"/>
-                <GradientStop Color="#13161C" Offset="1"/>
+                <GradientStop Color="#131720" Offset="0"/>
+                <GradientStop Color="#0F1218" Offset="1"/>
             </LinearGradientBrush>
 
             <!-- 多彩图标系（半透明圆底 + 亮色图标） -->
@@ -72,7 +86,7 @@
             <Setter Property="Background" Value="#6366F1"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="7"/>
         </Style>
         <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="#7B7DF3"/>
@@ -89,40 +103,86 @@
             <Setter Property="Height" Value="26"/>
         </Style>
 
+        <!-- 幽灵按钮：无底色，悬停浮现（勾选切换、次级动作） -->
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="CornerRadius" Value="7"/>
+        </Style>
+        <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+        </Style>
+
         <!-- ============ 卡片 ============ -->
         <Style Selector="Border.card">
             <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="BoxShadow" Value="0 1 6 0 #14000000"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="14"/>
+        </Style>
+        <!-- 悬停时描边微亮：卡片"浮起"的暗示（Avalonia 12 XAML 过渡声明见注释于 row 样式） -->
+        <Style Selector="Border.card:pointerover">
+            <Setter Property="BorderBrush" Value="#2A3040"/>
+        </Style>
+        <!-- 悬停时描边微亮：卡片"浮起"的暗示 -->
+        <Style Selector="Border.card:pointerover">
+            <Setter Property="BorderBrush" Value="#2A3040"/>
+        </Style>
+
+        <!-- KPI 瓦片：与卡片同族 -->
+        <Style Selector="Border.tile">
+            <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="14"/>
         </Style>
 
         <Style Selector="Border.stat">
             <Setter Property="Background" Value="{DynamicResource CardSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="CornerRadius" Value="14"/>
             <Setter Property="Padding" Value="18,16"/>
+        </Style>
+
+        <!-- 表头 / 井面 -->
+        <Style Selector="Border.tablehead">
+            <Setter Property="Background" Value="{DynamicResource AppWellBrush}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12,7"/>
         </Style>
 
         <!-- ============ 状态胶囊 / chip ============ -->
         <Style Selector="Border.pill">
             <Setter Property="CornerRadius" Value="999"/>
-            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style Selector="Border.chip">
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Background" Value="{DynamicResource AppRaisedBrush}"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
 
         <!-- ============ 列表行（圆角 hover，无分隔线，Linear 风） ============ -->
         <Style Selector="Border.row">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="12,10"/>
-            <Setter Property="Margin" Value="-12,1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="Margin" Value="-12,0"/>
+            <!-- 注：Avalonia 12 XAML 的 BrushTransition 声明会触发编译器 bug（AVLN2000），
+                 hover 过渡如需要请在代码后置声明；当前采用即时切换 -->
         </Style>
         <Style Selector="Border.row:pointerover">
-            <Setter Property="Background" Value="#171B24"/>
+            <Setter Property="Background" Value="{DynamicResource AppHoverBrush}"/>
         </Style>
 
         <!-- 行内操作：悬停浮现 -->
@@ -140,7 +200,7 @@
 
         <!-- ============ 文字层级 ============ -->
         <Style Selector="TextBlock.h1">
-            <Setter Property="FontSize" Value="19"/>
+            <Setter Property="FontSize" Value="17"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
         </Style>
@@ -151,14 +211,14 @@
         </Style>
         <!-- 全大写小标签：字距拉开，大厂标签层级 -->
         <Style Selector="TextBlock.overline">
-            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="FontSize" Value="10"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="LetterSpacing" Value="1.4"/>
+            <Setter Property="LetterSpacing" Value="1.2"/>
             <Setter Property="Foreground" Value="{DynamicResource AppTextTertiaryBrush}"/>
         </Style>
         <Style Selector="TextBlock.k">
-            <Setter Property="FontSize" Value="11.5"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextTertiaryBrush}"/>
         </Style>
         <Style Selector="TextBlock.v">
             <Setter Property="FontSize" Value="23"/>
@@ -180,12 +240,40 @@
             <Setter Property="LineHeight" Value="42"/>
             <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
         </Style>
+        <!-- KPI 数值：负字距更紧致 -->
+        <Style Selector="TextBlock.metric">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="LetterSpacing" Value="-0.5"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+        </Style>
+
+        <!-- ============ 仪表条（KPI 阈值进度） ============ -->
+        <Style Selector="ProgressBar.meter">
+            <Setter Property="Height" Value="4"/>
+            <Setter Property="MinHeight" Value="4"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Background" Value="{DynamicResource MeterTrackBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AccentSoftBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- ============ 终端式输出面 ============ -->
+        <Style Selector="TextBox.terminal">
+            <Setter Property="Background" Value="{DynamicResource AppWellBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="FontFamily" Value="Consolas, DejaVu Sans Mono, monospace"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
 
         <!-- ============ 图标圆底 ============ -->
         <Style Selector="Border.iconbadge">
-            <Setter Property="Width" Value="40"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="CornerRadius" Value="13"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
 

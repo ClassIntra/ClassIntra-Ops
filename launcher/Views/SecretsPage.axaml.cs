@@ -66,26 +66,29 @@ public partial class SecretsPage : UserControl
         var card = new Border { Classes = { "card" } };
         var stack = new StackPanel { Spacing = 10 };
 
-        stack.Children.Add(new TextBlock { Text = group.Title, FontWeight = FontWeight.SemiBold, FontSize = 14 });
-        if (group.Description.Length > 0)
-            stack.Children.Add(new TextBlock { Text = group.Description, FontSize = 12, Opacity = 0.62, TextWrapping = TextWrapping.Wrap });
-
-        // 两列网格排列字段，密钥多时更紧凑（Avalonia Grid 无 ColumnSpacing，用中缝列代替）
-        var grid = new Grid { ColumnDefinitions = ColumnDefinitions.Parse("*,18,*") };
-        var left = new StackPanel { Spacing = 10 };
-        var right = new StackPanel { Spacing = 10 };
-        Grid.SetColumn(left, 0);
-        Grid.SetColumn(right, 2);
-        grid.Children.Add(left);
-        grid.Children.Add(right);
-
-        for (var i = 0; i < group.Fields.Count; i++)
+        // 分组眉标：大字距小标签
+        stack.Children.Add(new TextBlock
         {
-            var host = i % 2 == 0 ? left : right;
-            host.Children.Add(BuildField(group.Fields[i]));
-        }
+            Text = group.Title,
+            FontSize = 10,
+            FontWeight = FontWeight.SemiBold,
+            LetterSpacing = 1.2,
+            Foreground = Palette.TextTertiary
+        });
+        if (group.Description.Length > 0)
+            stack.Children.Add(new TextBlock
+            {
+                Text = group.Description,
+                FontSize = 11,
+                Foreground = Palette.TextTertiary,
+                TextWrapping = TextWrapping.Wrap
+            });
 
-        stack.Children.Add(grid);
+        // 单列字段行：键列 / 输入 / 状态（键与值同行，扫读更快）
+        var host = new StackPanel { Spacing = 4 };
+        foreach (var f in group.Fields) host.Children.Add(BuildField(f));
+        stack.Children.Add(host);
+
         card.Child = stack;
         return card;
     }
@@ -101,46 +104,75 @@ public partial class SecretsPage : UserControl
                 ? (hasValue ? "已设置 " + _schema.Masked.GetValueOrDefault(field.Key, "") + "（留空不修改）" : "未设置")
                 : (field.DefaultValue.Length > 0 ? field.DefaultValue : ""),
             Text = field.Secret ? "" : current,
-            FontSize = 12.5
+            FontSize = 12,
+            Height = 32,
+            CornerRadius = new CornerRadius(8),
+            Background = Palette.Well,
+            BorderBrush = Palette.CardBorder,
+            VerticalContentAlignment = VerticalAlignment.Center
         };
         if (field.Secret && !_showPlain) box.PasswordChar = '•';
 
         _fields.Add((field, box));
 
-        var stack = new StackPanel { Spacing = 3 };
+        var grid = new Grid { ColumnDefinitions = ColumnDefinitions.Parse("200,12,*,12,Auto") };
 
-        // 标签行：键名 + 密钥标记
-        var labelRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        labelRow.Children.Add(new TextBlock
+        // 键列：键名 + 说明
+        var keyCol = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+        keyCol.Children.Add(new TextBlock
         {
             Text = field.Key,
             FontFamily = new FontFamily("Consolas, DejaVu Sans Mono, monospace"),
             FontSize = 11.5,
-            Opacity = 0.72
+            FontWeight = FontWeight.Medium,
+            Foreground = Palette.TextPrimary
         });
-        if (field.Secret)
-        {
-            labelRow.Children.Add(new Border
-            {
-                Classes = { "pill" },
-                Background = Palette.AccentBg,
-                Child = new TextBlock { Text = "密钥", FontSize = 10.5, Foreground = Palette.AccentFg }
-            });
-        }
-        stack.Children.Add(labelRow);
-        stack.Children.Add(box);
-
         if (field.Hint.Length > 0)
-            stack.Children.Add(new TextBlock
+            keyCol.Children.Add(new TextBlock
             {
                 Text = field.Hint,
-                FontSize = 11,
-                Opacity = 0.55,
-                TextWrapping = TextWrapping.Wrap
+                FontSize = 10.5,
+                Foreground = Palette.TextTertiary,
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 200
             });
+        Grid.SetColumn(keyCol, 0);
+        grid.Children.Add(keyCol);
 
-        return stack;
+        Grid.SetColumn(box, 2);
+        grid.Children.Add(box);
+
+        // 状态列：密钥标记 + 是否已设置
+        var chips = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        if (field.Secret)
+            chips.Children.Add(MakeChip("密钥", Palette.AccentSoftFg, Palette.AccentSoftBg));
+        chips.Children.Add(hasValue
+            ? MakeChip("已设置", Palette.Lime, Palette.LimeBg)
+            : MakeChip("未设置", Palette.NeutralFg, Palette.NeutralBg));
+        Grid.SetColumn(chips, 4);
+        grid.Children.Add(chips);
+
+        return grid;
     }
+
+    private static Control MakeChip(string text, IBrush fg, IBrush bg) => new Border
+    {
+        Classes = { "pill" },
+        Background = bg,
+        Padding = new Thickness(7, 2),
+        Child = new TextBlock
+        {
+            Text = text,
+            FontSize = 10,
+            FontWeight = FontWeight.Medium,
+            Foreground = fg
+        }
+    };
 
     private static Control Note(string text) =>
         new TextBlock { Text = text, FontSize = 12.5, Opacity = 0.75, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(4) };

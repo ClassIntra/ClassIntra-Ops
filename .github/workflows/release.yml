@@ -1,0 +1,39 @@
+name: Release
+
+# 推送 v* 标签时：云端构建 Windows 自包含单文件，并创建带产物的 Release
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish（自包含单文件）
+        run: >
+          dotnet publish launcher/ClassIntraOps.Launcher.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=none -o publish
+
+      - name: 打包 zip
+        shell: pwsh
+        run: >
+          Compress-Archive -Path publish/ClassIntraOps.exe
+          -DestinationPath "ClassIntraOps-${{ github.ref_name }}-win-x64.zip" -Force
+
+      - name: 创建 Release 并上传产物
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ClassIntraOps-${{ github.ref_name }}-win-x64.zip
+          generate_release_notes: true

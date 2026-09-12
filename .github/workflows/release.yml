@@ -26,14 +26,14 @@ jobs:
           -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
           -p:DebugType=none -o publish
 
-      - name: 打包 zip
+      - name: 整理产物（带版本命名的单文件 exe）
         shell: pwsh
         run: >
-          Compress-Archive -Path publish/ClassIntraOps.exe
-          -DestinationPath "ClassIntraOps-${{ github.ref_name }}-win-x64.zip" -Force
+          Copy-Item publish/ClassIntraOps.exe
+          "ClassIntraOps-${{ github.ref_name }}-win-x64.exe" -Force
 
       - name: 创建 Release 并上传产物
         uses: softprops/action-gh-release@v2
         with:
-          files: ClassIntraOps-${{ github.ref_name }}-win-x64.zip
+          files: ClassIntraOps-${{ github.ref_name }}-win-x64.exe
           generate_release_notes: true

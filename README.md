@@ -2,7 +2,7 @@
 
 ClassIntra（CI）的运维控制台。独立仓库，不依赖 CI 的任何模块。
 
-**下载**：[Releases](https://github.com/ClassIntra/ClassIntra-Ops/releases) 提供 Windows x64 自包含单文件（如 `ClassIntraOps-v0.1-win-x64.zip`），解压即用，无需安装 .NET。
+**下载**：[Releases](https://github.com/ClassIntra/ClassIntra-Ops/releases) 提供 Windows x64 自包含单文件（如 `ClassIntraOps-v0.1-win-x64.exe`，约 99MB），下载即用，无需安装 .NET。
 
 ## 形态
 
